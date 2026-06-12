@@ -1,0 +1,23 @@
+# Replit configuration — World Cup 2026 Sweepstake
+# Click "Run" to install dependencies and start the Flask server.
+run = "pip install -q -r requirements.txt && python3 app.py"
+entrypoint = "app.py"
+modules = ["python-3.11:v1"]
+
+[nix]
+channel = "stable-24_05"
+
+[env]
+PORT = "8080"
+# Show demo data on first boot. Remove to start with an empty board.
+WC_AUTOSEED = "1"
+# Optional: set ADMIN_TOKEN to protect the write/feed routes.
+# Optional: set FOOTBALL_DATA_API_KEY (football-data.org) for live results.
+
+[deployment]
+run = ["sh", "-c", "python3 app.py"]
+deploymentTarget = "cloudrun"
+
+[[ports]]
+localPort = 8080
+externalPort = 80

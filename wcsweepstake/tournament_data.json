@@ -1,0 +1,1293 @@
+{
+  "tournament": "FIFA World Cup 2026",
+  "groups": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H",
+    "I",
+    "J",
+    "K",
+    "L"
+  ],
+  "teams": [
+    {
+      "country": "Czechia",
+      "group": "A",
+      "owner_short": "Div",
+      "owner": "Div Saxena",
+      "paid": false
+    },
+    {
+      "country": "Korea Republic",
+      "group": "A",
+      "owner_short": "Marija",
+      "owner": "Marija Skramic",
+      "paid": true
+    },
+    {
+      "country": "Mexico",
+      "group": "A",
+      "owner_short": "Sean",
+      "owner": "Sean Gill",
+      "paid": true
+    },
+    {
+      "country": "South Africa",
+      "group": "A",
+      "owner_short": "Matt M",
+      "owner": "Matt Millar",
+      "paid": true
+    },
+    {
+      "country": "Bosnia and Herzegovina",
+      "group": "B",
+      "owner_short": "Sean",
+      "owner": "Sean Gill",
+      "paid": false
+    },
+    {
+      "country": "Canada",
+      "group": "B",
+      "owner_short": "Nick",
+      "owner": "Nick Robinson",
+      "paid": true
+    },
+    {
+      "country": "Qatar",
+      "group": "B",
+      "owner_short": "Mike",
+      "owner": "Mike Jackson",
+      "paid": true
+    },
+    {
+      "country": "Switzerland",
+      "group": "B",
+      "owner_short": "Nick",
+      "owner": "Nick Robinson",
+      "paid": true
+    },
+    {
+      "country": "Brazil",
+      "group": "C",
+      "owner_short": "Fabio",
+      "owner": "Fabio Allegra",
+      "paid": true
+    },
+    {
+      "country": "Haiti",
+      "group": "C",
+      "owner_short": "Nelly",
+      "owner": "Nelly Trakidou",
+      "paid": true
+    },
+    {
+      "country": "Morocco",
+      "group": "C",
+      "owner_short": "Mark",
+      "owner": "Mark Evans",
+      "paid": false
+    },
+    {
+      "country": "Scotland",
+      "group": "C",
+      "owner_short": "Tom",
+      "owner": "Tom Low",
+      "paid": true
+    },
+    {
+      "country": "Australia",
+      "group": "D",
+      "owner_short": "Caoimhe",
+      "owner": "Caoimhe Whelan",
+      "paid": true
+    },
+    {
+      "country": "Paraguay",
+      "group": "D",
+      "owner_short": "Lucy",
+      "owner": "Lucy Philpott",
+      "paid": false
+    },
+    {
+      "country": "Türkiye",
+      "group": "D",
+      "owner_short": "Caoimhe",
+      "owner": "Caoimhe Whelan",
+      "paid": true
+    },
+    {
+      "country": "USA",
+      "group": "D",
+      "owner_short": "Lucy",
+      "owner": "Lucy Philpott",
+      "paid": true
+    },
+    {
+      "country": "Curaçao",
+      "group": "E",
+      "owner_short": "Rich",
+      "owner": "Richard Ehlen",
+      "paid": true
+    },
+    {
+      "country": "Côte d'Ivoire",
+      "group": "E",
+      "owner_short": "Matt M",
+      "owner": "Matt Millar",
+      "paid": false
+    },
+    {
+      "country": "Ecuador",
+      "group": "E",
+      "owner_short": "Matt M",
+      "owner": "Matt Millar",
+      "paid": true
+    },
+    {
+      "country": "Germany",
+      "group": "E",
+      "owner_short": "Ben",
+      "owner": "Ben Eveson",
+      "paid": false
+    },
+    {
+      "country": "Japan",
+      "group": "F",
+      "owner_short": "Tina",
+      "owner": "Tina Louis",
+      "paid": true
+    },
+    {
+      "country": "Netherlands",
+      "group": "F",
+      "owner_short": "Jane",
+      "owner": "Jane Stinson",
+      "paid": true
+    },
+    {
+      "country": "Sweden",
+      "group": "F",
+      "owner_short": "Tom",
+      "owner": "Tom Low",
+      "paid": true
+    },
+    {
+      "country": "Tunisia",
+      "group": "F",
+      "owner_short": "Rich",
+      "owner": "Richard Ehlen",
+      "paid": false
+    },
+    {
+      "country": "Belgium",
+      "group": "G",
+      "owner_short": "Matt P",
+      "owner": "Matt Perry",
+      "paid": false
+    },
+    {
+      "country": "Egypt",
+      "group": "G",
+      "owner_short": "Marija",
+      "owner": "Marija Skramic",
+      "paid": false
+    },
+    {
+      "country": "IR Iran",
+      "group": "G",
+      "owner_short": "Nick",
+      "owner": "Nick Robinson",
+      "paid": false
+    },
+    {
+      "country": "New Zealand",
+      "group": "G",
+      "owner_short": "Ben",
+      "owner": "Ben Eveson",
+      "paid": true
+    },
+    {
+      "country": "Cabo Verde",
+      "group": "H",
+      "owner_short": "Div",
+      "owner": "Div Saxena",
+      "paid": true
+    },
+    {
+      "country": "Saudi Arabia",
+      "group": "H",
+      "owner_short": "Tish",
+      "owner": "Atish Nazir",
+      "paid": true
+    },
+    {
+      "country": "Spain",
+      "group": "H",
+      "owner_short": "Matt P",
+      "owner": "Matt Perry",
+      "paid": true
+    },
+    {
+      "country": "Uruguay",
+      "group": "H",
+      "owner_short": "Caoimhe",
+      "owner": "Caoimhe Whelan",
+      "paid": true
+    },
+    {
+      "country": "France",
+      "group": "I",
+      "owner_short": "Tom",
+      "owner": "Tom Low",
+      "paid": true
+    },
+    {
+      "country": "Iraq",
+      "group": "I",
+      "owner_short": "Scott",
+      "owner": "Scott Wallman",
+      "paid": true
+    },
+    {
+      "country": "Norway",
+      "group": "I",
+      "owner_short": "Ben",
+      "owner": "Ben Eveson",
+      "paid": true
+    },
+    {
+      "country": "Senegal",
+      "group": "I",
+      "owner_short": "Nelly",
+      "owner": "Nelly Trakidou",
+      "paid": false
+    },
+    {
+      "country": "Algeria",
+      "group": "J",
+      "owner_short": "Scott",
+      "owner": "Scott Wallman",
+      "paid": false
+    },
+    {
+      "country": "Argentina",
+      "group": "J",
+      "owner_short": "Jane",
+      "owner": "Jane Stinson",
+      "paid": false
+    },
+    {
+      "country": "Austria",
+      "group": "J",
+      "owner_short": "Tish",
+      "owner": "Atish Nazir",
+      "paid": false
+    },
+    {
+      "country": "Jordan",
+      "group": "J",
+      "owner_short": "Tina",
+      "owner": "Tina Louis",
+      "paid": false
+    },
+    {
+      "country": "Colombia",
+      "group": "K",
+      "owner_short": "Mark",
+      "owner": "Mark Evans",
+      "paid": true
+    },
+    {
+      "country": "Congo DR",
+      "group": "K",
+      "owner_short": "Tom",
+      "owner": "Tom Low",
+      "paid": false
+    },
+    {
+      "country": "Portugal",
+      "group": "K",
+      "owner_short": "Matt P",
+      "owner": "Matt Perry",
+      "paid": true
+    },
+    {
+      "country": "Uzbekistan",
+      "group": "K",
+      "owner_short": "Katia",
+      "owner": "Katia Newman",
+      "paid": true
+    },
+    {
+      "country": "Croatia",
+      "group": "L",
+      "owner_short": "Sean",
+      "owner": "Sean Gill",
+      "paid": true
+    },
+    {
+      "country": "England",
+      "group": "L",
+      "owner_short": "Katia",
+      "owner": "Katia Newman",
+      "paid": false
+    },
+    {
+      "country": "Ghana",
+      "group": "L",
+      "owner_short": "Tina",
+      "owner": "Tina Louis",
+      "paid": true
+    },
+    {
+      "country": "Panama",
+      "group": "L",
+      "owner_short": "Mike",
+      "owner": "Mike Jackson",
+      "paid": true
+    }
+  ],
+  "people": [
+    {
+      "name": "Atish Nazir",
+      "short": "Tish"
+    },
+    {
+      "name": "Ben Eveson",
+      "short": "Ben"
+    },
+    {
+      "name": "Caoimhe Whelan",
+      "short": "Caoimhe"
+    },
+    {
+      "name": "Div Saxena",
+      "short": "Div"
+    },
+    {
+      "name": "Fabio Allegra",
+      "short": "Fabio"
+    },
+    {
+      "name": "Jane Stinson",
+      "short": "Jane"
+    },
+    {
+      "name": "Katia Newman",
+      "short": "Katia"
+    },
+    {
+      "name": "Lucy Philpott",
+      "short": "Lucy"
+    },
+    {
+      "name": "Marija Skramic",
+      "short": "Marija"
+    },
+    {
+      "name": "Mark Evans",
+      "short": "Mark"
+    },
+    {
+      "name": "Matt Millar",
+      "short": "Matt M"
+    },
+    {
+      "name": "Matt Perry",
+      "short": "Matt P"
+    },
+    {
+      "name": "Mike Jackson",
+      "short": "Mike"
+    },
+    {
+      "name": "Nelly Trakidou",
+      "short": "Nelly"
+    },
+    {
+      "name": "Nick Robinson",
+      "short": "Nick"
+    },
+    {
+      "name": "Richard Ehlen",
+      "short": "Rich"
+    },
+    {
+      "name": "Scott Wallman",
+      "short": "Scott"
+    },
+    {
+      "name": "Sean Gill",
+      "short": "Sean"
+    },
+    {
+      "name": "Tina Louis",
+      "short": "Tina"
+    },
+    {
+      "name": "Tom Low",
+      "short": "Tom"
+    }
+  ],
+  "fixtures": [
+    {
+      "match": "A1",
+      "group": "A",
+      "home": "Mexico",
+      "away": "South Africa",
+      "date": "2026-06-11",
+      "date_label": "11th June",
+      "ko": "20:00"
+    },
+    {
+      "match": "A2",
+      "group": "A",
+      "home": "Korea Republic",
+      "away": "Czechia",
+      "date": "2026-06-12",
+      "date_label": "12th June",
+      "ko": "03:00"
+    },
+    {
+      "match": "A3",
+      "group": "A",
+      "home": "Mexico",
+      "away": "Korea Republic",
+      "date": "2026-06-19",
+      "date_label": "19th June",
+      "ko": "02:00"
+    },
+    {
+      "match": "A4",
+      "group": "A",
+      "home": "Czechia",
+      "away": "South Africa",
+      "date": "2026-06-18",
+      "date_label": "18th June",
+      "ko": "17:00"
+    },
+    {
+      "match": "A5",
+      "group": "A",
+      "home": "Czechia",
+      "away": "Mexico",
+      "date": "2026-06-25",
+      "date_label": "25th June",
+      "ko": "02:00"
+    },
+    {
+      "match": "A6",
+      "group": "A",
+      "home": "South Africa",
+      "away": "Korea Republic",
+      "date": "2026-06-25",
+      "date_label": "25th June",
+      "ko": "02:00"
+    },
+    {
+      "match": "B1",
+      "group": "B",
+      "home": "Canada",
+      "away": "Bosnia and Herzegovina",
+      "date": "2026-06-12",
+      "date_label": "12th June",
+      "ko": "20:00"
+    },
+    {
+      "match": "B2",
+      "group": "B",
+      "home": "Qatar",
+      "away": "Switzerland",
+      "date": "2026-06-13",
+      "date_label": "13th June",
+      "ko": "20:00"
+    },
+    {
+      "match": "B3",
+      "group": "B",
+      "home": "Canada",
+      "away": "Qatar",
+      "date": "2026-06-18",
+      "date_label": "18th June",
+      "ko": "23:00"
+    },
+    {
+      "match": "B4",
+      "group": "B",
+      "home": "Switzerland",
+      "away": "Bosnia and Herzegovina",
+      "date": "2026-06-18",
+      "date_label": "18th June",
+      "ko": "20:00"
+    },
+    {
+      "match": "B5",
+      "group": "B",
+      "home": "Switzerland",
+      "away": "Canada",
+      "date": "2026-06-24",
+      "date_label": "24th June",
+      "ko": "20:00"
+    },
+    {
+      "match": "B6",
+      "group": "B",
+      "home": "Bosnia and Herzegovina",
+      "away": "Qatar",
+      "date": "2026-06-24",
+      "date_label": "24th June",
+      "ko": "20:00"
+    },
+    {
+      "match": "C1",
+      "group": "C",
+      "home": "Brazil",
+      "away": "Morocco",
+      "date": "2026-06-13",
+      "date_label": "13th June",
+      "ko": "23:00"
+    },
+    {
+      "match": "C2",
+      "group": "C",
+      "home": "Haiti",
+      "away": "Scotland",
+      "date": "2026-06-14",
+      "date_label": "14th June",
+      "ko": "02:00"
+    },
+    {
+      "match": "C3",
+      "group": "C",
+      "home": "Brazil",
+      "away": "Haiti",
+      "date": "2026-06-20",
+      "date_label": "20th June",
+      "ko": "01:30"
+    },
+    {
+      "match": "C4",
+      "group": "C",
+      "home": "Scotland",
+      "away": "Morocco",
+      "date": "2026-06-19",
+      "date_label": "19th June",
+      "ko": "23:00"
+    },
+    {
+      "match": "C5",
+      "group": "C",
+      "home": "Scotland",
+      "away": "Brazil",
+      "date": "2026-06-24",
+      "date_label": "24th June",
+      "ko": "23:00"
+    },
+    {
+      "match": "C6",
+      "group": "C",
+      "home": "Morocco",
+      "away": "Haiti",
+      "date": "2026-06-24",
+      "date_label": "24th June",
+      "ko": "23:00"
+    },
+    {
+      "match": "D1",
+      "group": "D",
+      "home": "USA",
+      "away": "Paraguay",
+      "date": "2026-06-13",
+      "date_label": "13th June",
+      "ko": "02:00"
+    },
+    {
+      "match": "D2",
+      "group": "D",
+      "home": "Australia",
+      "away": "Türkiye",
+      "date": "2026-06-14",
+      "date_label": "14th June",
+      "ko": "05:00"
+    },
+    {
+      "match": "D3",
+      "group": "D",
+      "home": "USA",
+      "away": "Australia",
+      "date": "2026-06-19",
+      "date_label": "19th June",
+      "ko": "20:00"
+    },
+    {
+      "match": "D4",
+      "group": "D",
+      "home": "Türkiye",
+      "away": "Paraguay",
+      "date": "2026-06-20",
+      "date_label": "20th June",
+      "ko": "04:00"
+    },
+    {
+      "match": "D5",
+      "group": "D",
+      "home": "Türkiye",
+      "away": "USA",
+      "date": "2026-06-26",
+      "date_label": "26th June",
+      "ko": "03:00"
+    },
+    {
+      "match": "D6",
+      "group": "D",
+      "home": "Paraguay",
+      "away": "Australia",
+      "date": "2026-06-26",
+      "date_label": "26th June",
+      "ko": "03:00"
+    },
+    {
+      "match": "E1",
+      "group": "E",
+      "home": "Germany",
+      "away": "Curaçao",
+      "date": "2026-06-14",
+      "date_label": "14th June",
+      "ko": "18:00"
+    },
+    {
+      "match": "E2",
+      "group": "E",
+      "home": "Côte d'Ivoire",
+      "away": "Ecuador",
+      "date": "2026-06-15",
+      "date_label": "15th June",
+      "ko": "00:00"
+    },
+    {
+      "match": "E3",
+      "group": "E",
+      "home": "Germany",
+      "away": "Côte d'Ivoire",
+      "date": "2026-06-20",
+      "date_label": "20th June",
+      "ko": "21:00"
+    },
+    {
+      "match": "E4",
+      "group": "E",
+      "home": "Ecuador",
+      "away": "Curaçao",
+      "date": "2026-06-21",
+      "date_label": "21st June",
+      "ko": "01:00"
+    },
+    {
+      "match": "E5",
+      "group": "E",
+      "home": "Ecuador",
+      "away": "Germany",
+      "date": "2026-06-25",
+      "date_label": "25th June",
+      "ko": "21:00"
+    },
+    {
+      "match": "E6",
+      "group": "E",
+      "home": "Curaçao",
+      "away": "Côte d'Ivoire",
+      "date": "2026-06-25",
+      "date_label": "25th June",
+      "ko": "21:00"
+    },
+    {
+      "match": "F1",
+      "group": "F",
+      "home": "Netherlands",
+      "away": "Japan",
+      "date": "2026-06-14",
+      "date_label": "14th June",
+      "ko": "21:00"
+    },
+    {
+      "match": "F2",
+      "group": "F",
+      "home": "Sweden",
+      "away": "Tunisia",
+      "date": "2026-06-15",
+      "date_label": "15th June",
+      "ko": "03:00"
+    },
+    {
+      "match": "F3",
+      "group": "F",
+      "home": "Netherlands",
+      "away": "Sweden",
+      "date": "2026-06-20",
+      "date_label": "20th June",
+      "ko": "18:00"
+    },
+    {
+      "match": "F4",
+      "group": "F",
+      "home": "Tunisia",
+      "away": "Japan",
+      "date": "2026-06-21",
+      "date_label": "21st June",
+      "ko": "05:00"
+    },
+    {
+      "match": "F5",
+      "group": "F",
+      "home": "Tunisia",
+      "away": "Netherlands",
+      "date": "2026-06-26",
+      "date_label": "26th June",
+      "ko": "00:00"
+    },
+    {
+      "match": "F6",
+      "group": "F",
+      "home": "Japan",
+      "away": "Sweden",
+      "date": "2026-06-26",
+      "date_label": "26th June",
+      "ko": "00:00"
+    },
+    {
+      "match": "G1",
+      "group": "G",
+      "home": "Belgium",
+      "away": "Egypt",
+      "date": "2026-06-15",
+      "date_label": "15th June",
+      "ko": "20:00"
+    },
+    {
+      "match": "G2",
+      "group": "G",
+      "home": "IR Iran",
+      "away": "New Zealand",
+      "date": "2026-06-16",
+      "date_label": "16th June",
+      "ko": "02:00"
+    },
+    {
+      "match": "G3",
+      "group": "G",
+      "home": "Belgium",
+      "away": "IR Iran",
+      "date": "2026-06-21",
+      "date_label": "21st June",
+      "ko": "20:00"
+    },
+    {
+      "match": "G4",
+      "group": "G",
+      "home": "New Zealand",
+      "away": "Egypt",
+      "date": "2026-06-22",
+      "date_label": "22nd June",
+      "ko": "02:00"
+    },
+    {
+      "match": "G5",
+      "group": "G",
+      "home": "New Zealand",
+      "away": "Belgium",
+      "date": "2026-06-27",
+      "date_label": "27th June",
+      "ko": "04:00"
+    },
+    {
+      "match": "G6",
+      "group": "G",
+      "home": "Egypt",
+      "away": "IR Iran",
+      "date": "2026-06-27",
+      "date_label": "27th June",
+      "ko": "04:00"
+    },
+    {
+      "match": "H1",
+      "group": "H",
+      "home": "Spain",
+      "away": "Cabo Verde",
+      "date": "2026-06-15",
+      "date_label": "15th June",
+      "ko": "17:00"
+    },
+    {
+      "match": "H2",
+      "group": "H",
+      "home": "Saudi Arabia",
+      "away": "Uruguay",
+      "date": "2026-06-15",
+      "date_label": "15th June",
+      "ko": "23:00"
+    },
+    {
+      "match": "H3",
+      "group": "H",
+      "home": "Spain",
+      "away": "Saudi Arabia",
+      "date": "2026-06-21",
+      "date_label": "21st June",
+      "ko": "17:00"
+    },
+    {
+      "match": "H4",
+      "group": "H",
+      "home": "Uruguay",
+      "away": "Cabo Verde",
+      "date": "2026-06-21",
+      "date_label": "21st June",
+      "ko": "23:00"
+    },
+    {
+      "match": "H5",
+      "group": "H",
+      "home": "Uruguay",
+      "away": "Spain",
+      "date": "2026-06-27",
+      "date_label": "27th June",
+      "ko": "01:00"
+    },
+    {
+      "match": "H6",
+      "group": "H",
+      "home": "Cabo Verde",
+      "away": "Saudi Arabia",
+      "date": "2026-06-27",
+      "date_label": "27th June",
+      "ko": "01:00"
+    },
+    {
+      "match": "I1",
+      "group": "I",
+      "home": "France",
+      "away": "Senegal",
+      "date": "2026-06-16",
+      "date_label": "16th June",
+      "ko": "20:00"
+    },
+    {
+      "match": "I2",
+      "group": "I",
+      "home": "Iraq",
+      "away": "Norway",
+      "date": "2026-06-16",
+      "date_label": "16th June",
+      "ko": "23:00"
+    },
+    {
+      "match": "I3",
+      "group": "I",
+      "home": "France",
+      "away": "Iraq",
+      "date": "2026-06-22",
+      "date_label": "22nd June",
+      "ko": "22:00"
+    },
+    {
+      "match": "I4",
+      "group": "I",
+      "home": "Norway",
+      "away": "Senegal",
+      "date": "2026-06-23",
+      "date_label": "23rd June",
+      "ko": "01:00"
+    },
+    {
+      "match": "I5",
+      "group": "I",
+      "home": "Norway",
+      "away": "France",
+      "date": "2026-06-26",
+      "date_label": "26th June",
+      "ko": "20:00"
+    },
+    {
+      "match": "I6",
+      "group": "I",
+      "home": "Senegal",
+      "away": "Iraq",
+      "date": "2026-06-26",
+      "date_label": "26th June",
+      "ko": "20:00"
+    },
+    {
+      "match": "J1",
+      "group": "J",
+      "home": "Argentina",
+      "away": "Algeria",
+      "date": "2026-06-17",
+      "date_label": "17th June",
+      "ko": "02:00"
+    },
+    {
+      "match": "J2",
+      "group": "J",
+      "home": "Austria",
+      "away": "Jordan",
+      "date": "2026-06-17",
+      "date_label": "17th June",
+      "ko": "05:00"
+    },
+    {
+      "match": "J3",
+      "group": "J",
+      "home": "Argentina",
+      "away": "Austria",
+      "date": "2026-06-22",
+      "date_label": "22nd June",
+      "ko": "18:00"
+    },
+    {
+      "match": "J4",
+      "group": "J",
+      "home": "Jordan",
+      "away": "Algeria",
+      "date": "2026-06-23",
+      "date_label": "23rd June",
+      "ko": "04:00"
+    },
+    {
+      "match": "J5",
+      "group": "J",
+      "home": "Jordan",
+      "away": "Argentina",
+      "date": "2026-06-28",
+      "date_label": "28th June",
+      "ko": "03:00"
+    },
+    {
+      "match": "J6",
+      "group": "J",
+      "home": "Algeria",
+      "away": "Austria",
+      "date": "2026-06-28",
+      "date_label": "28th June",
+      "ko": "03:00"
+    },
+    {
+      "match": "K1",
+      "group": "K",
+      "home": "Portugal",
+      "away": "Congo DR",
+      "date": "2026-06-17",
+      "date_label": "17th June",
+      "ko": "18:00"
+    },
+    {
+      "match": "K2",
+      "group": "K",
+      "home": "Uzbekistan",
+      "away": "Colombia",
+      "date": "2026-06-18",
+      "date_label": "18th June",
+      "ko": "03:00"
+    },
+    {
+      "match": "K3",
+      "group": "K",
+      "home": "Portugal",
+      "away": "Uzbekistan",
+      "date": "2026-06-23",
+      "date_label": "23rd June",
+      "ko": "18:00"
+    },
+    {
+      "match": "K4",
+      "group": "K",
+      "home": "Colombia",
+      "away": "Congo DR",
+      "date": "2026-06-24",
+      "date_label": "24th June",
+      "ko": "03:00"
+    },
+    {
+      "match": "K5",
+      "group": "K",
+      "home": "Colombia",
+      "away": "Portugal",
+      "date": "2026-06-28",
+      "date_label": "28th June",
+      "ko": "00:30"
+    },
+    {
+      "match": "K6",
+      "group": "K",
+      "home": "Congo DR",
+      "away": "Uzbekistan",
+      "date": "2026-06-28",
+      "date_label": "28th June",
+      "ko": "00:30"
+    },
+    {
+      "match": "L1",
+      "group": "L",
+      "home": "England",
+      "away": "Croatia",
+      "date": "2026-06-17",
+      "date_label": "17th June",
+      "ko": "21:00"
+    },
+    {
+      "match": "L2",
+      "group": "L",
+      "home": "Ghana",
+      "away": "Panama",
+      "date": "2026-06-18",
+      "date_label": "18th June",
+      "ko": "00:00"
+    },
+    {
+      "match": "L3",
+      "group": "L",
+      "home": "England",
+      "away": "Ghana",
+      "date": "2026-06-23",
+      "date_label": "23rd June",
+      "ko": "21:00"
+    },
+    {
+      "match": "L4",
+      "group": "L",
+      "home": "Panama",
+      "away": "Croatia",
+      "date": "2026-06-24",
+      "date_label": "24th June",
+      "ko": "00:00"
+    },
+    {
+      "match": "L5",
+      "group": "L",
+      "home": "Panama",
+      "away": "England",
+      "date": "2026-06-27",
+      "date_label": "27th June",
+      "ko": "22:00"
+    },
+    {
+      "match": "L6",
+      "group": "L",
+      "home": "Croatia",
+      "away": "Ghana",
+      "date": "2026-06-27",
+      "date_label": "27th June",
+      "ko": "22:00"
+    }
+  ],
+  "knockout_meta": {
+    "73": {
+      "round": "Round of 32",
+      "date": "2026-06-28",
+      "date_label": "28th June",
+      "ko": "20:00"
+    },
+    "74": {
+      "round": "Round of 32",
+      "date": "2026-06-29",
+      "date_label": "29th June",
+      "ko": "21:30"
+    },
+    "75": {
+      "round": "Round of 32",
+      "date": "2026-06-30",
+      "date_label": "30th June",
+      "ko": "02:00"
+    },
+    "76": {
+      "round": "Round of 32",
+      "date": "2026-06-29",
+      "date_label": "29th June",
+      "ko": "18:00"
+    },
+    "77": {
+      "round": "Round of 32",
+      "date": "2026-06-30",
+      "date_label": "30th June",
+      "ko": "22:00"
+    },
+    "78": {
+      "round": "Round of 32",
+      "date": "2026-06-30",
+      "date_label": "30th June",
+      "ko": "18:00"
+    },
+    "79": {
+      "round": "Round of 32",
+      "date": "2026-07-01",
+      "date_label": "1st July",
+      "ko": "02:00"
+    },
+    "80": {
+      "round": "Round of 32",
+      "date": "2026-07-01",
+      "date_label": "1st July",
+      "ko": "17:00"
+    },
+    "81": {
+      "round": "Round of 32",
+      "date": "2026-07-02",
+      "date_label": "2nd July",
+      "ko": "01:00"
+    },
+    "82": {
+      "round": "Round of 32",
+      "date": "2026-07-01",
+      "date_label": "1st July",
+      "ko": "21:00"
+    },
+    "83": {
+      "round": "Round of 32",
+      "date": "2026-07-03",
+      "date_label": "3rd July",
+      "ko": "00:00"
+    },
+    "84": {
+      "round": "Round of 32",
+      "date": "2026-07-02",
+      "date_label": "2nd July",
+      "ko": "20:00"
+    },
+    "85": {
+      "round": "Round of 32",
+      "date": "2026-07-03",
+      "date_label": "3rd July",
+      "ko": "04:00"
+    },
+    "86": {
+      "round": "Round of 32",
+      "date": "2026-07-03",
+      "date_label": "3rd July",
+      "ko": "23:00"
+    },
+    "87": {
+      "round": "Round of 32",
+      "date": "2026-07-04",
+      "date_label": "4th July",
+      "ko": "02:30"
+    },
+    "88": {
+      "round": "Round of 32",
+      "date": "2026-07-03",
+      "date_label": "3rd July",
+      "ko": "19:00"
+    },
+    "89": {
+      "round": "Round of 16",
+      "date": "2026-07-04",
+      "date_label": "4th July",
+      "ko": "22:00"
+    },
+    "90": {
+      "round": "Round of 16",
+      "date": "2026-07-04",
+      "date_label": "4th July",
+      "ko": "18:00"
+    },
+    "91": {
+      "round": "Round of 16",
+      "date": "2026-07-05",
+      "date_label": "5th July",
+      "ko": "21:00"
+    },
+    "92": {
+      "round": "Round of 16",
+      "date": "2026-07-06",
+      "date_label": "6th July",
+      "ko": "01:00"
+    },
+    "93": {
+      "round": "Round of 16",
+      "date": "2026-07-06",
+      "date_label": "6th July",
+      "ko": "20:00"
+    },
+    "94": {
+      "round": "Round of 16",
+      "date": "2026-07-07",
+      "date_label": "7th July",
+      "ko": "01:00"
+    },
+    "95": {
+      "round": "Round of 16",
+      "date": "2026-07-07",
+      "date_label": "7th July",
+      "ko": "17:00"
+    },
+    "96": {
+      "round": "Round of 16",
+      "date": "2026-07-07",
+      "date_label": "7th July",
+      "ko": "21:00"
+    },
+    "97": {
+      "round": "Quarter-final",
+      "date": "2026-07-09",
+      "date_label": "9th July",
+      "ko": "21:00"
+    },
+    "98": {
+      "round": "Quarter-final",
+      "date": "2026-07-10",
+      "date_label": "10th July",
+      "ko": "20:00"
+    },
+    "99": {
+      "round": "Quarter-final",
+      "date": "2026-07-11",
+      "date_label": "11th July",
+      "ko": "22:00"
+    },
+    "100": {
+      "round": "Quarter-final",
+      "date": "2026-07-12",
+      "date_label": "12th July",
+      "ko": "02:00"
+    },
+    "101": {
+      "round": "Semi-final",
+      "date": "2026-07-14",
+      "date_label": "14th July",
+      "ko": "20:00"
+    },
+    "102": {
+      "round": "Semi-final",
+      "date": "2026-07-15",
+      "date_label": "15th July",
+      "ko": "20:00"
+    },
+    "103": {
+      "round": "Third Place",
+      "date": "2026-07-18",
+      "date_label": "18th July",
+      "ko": "22:00"
+    }
+  },
+  "prize_pot": {
+    "total": 155,
+    "stake_per_team": 5,
+    "prizes": [
+      {
+        "label": "1st place",
+        "amount": 50
+      },
+      {
+        "label": "2nd place",
+        "amount": 25
+      },
+      {
+        "label": "MIND (charity)",
+        "amount": 80
+      }
+    ]
+  }
+}
