@@ -27,6 +27,7 @@
     renderFeed();
     renderGroups();
     renderThirds();
+    renderScores();
     renderBracket();
     renderLeaderboard();
     renderPlayers();
@@ -145,6 +146,78 @@
         <div class="owner">Group ${esc(t.group)} · ${t.points} pts · GD ${t.gd > 0 ? "+" : ""}${t.gd}</div></div>`;
       row.appendChild(c);
     });
+  }
+
+  /* ----------------------------------------------------------------- scores */
+  // One result row: Home (owner · pts) — score – score — Away (owner · pts).
+  function scoreRow(home, away, hs, as_, homeWin, awayWin, homeSub, awaySub, meta) {
+    const row = el("div", "score-row card");
+    row.innerHTML = `
+      <div class="sr-side home ${homeWin ? "win" : ""}">
+        <div class="sr-name">${esc(home)}</div><div class="sr-sub">${homeSub}</div>
+      </div>
+      <div class="sr-center">
+        <div class="sr-score">${hs}<span>–</span>${as_}</div>
+        ${meta ? `<div class="sr-meta">${esc(meta)}</div>` : ""}
+      </div>
+      <div class="sr-side away ${awayWin ? "win" : ""}">
+        <div class="sr-name">${esc(away)}</div><div class="sr-sub">${awaySub}</div>
+      </div>`;
+    return row;
+  }
+
+  const ptsLabel = (p) => (p > 0 ? "+" : "") + p; // +3 / +1 / 0
+  const ownerOf = (c) => ownerByCountry[c] || "?";
+
+  function renderScores() {
+    const wrap = $("#scores");
+    wrap.innerHTML = "";
+    const groupPlayed = (STATE.fixtures || []).filter((f) => f.played);
+    const koPlayed = (STATE.bracket || []).filter((m) => m.score1 != null && m.score2 != null);
+    $("#scoresSummary").textContent =
+      `${groupPlayed.length + koPlayed.length} of 104 matches played.`;
+
+    if (!groupPlayed.length && !koPlayed.length) {
+      wrap.appendChild(el("div", "card empty",
+        "No results yet — scores will appear here as games are played."));
+      return;
+    }
+
+    // Group stage, organised by group (so a team's results sit together).
+    STATE.groups.forEach((g) => {
+      const matches = groupPlayed
+        .filter((f) => f.group === g)
+        .sort((a, b) => a.match.localeCompare(b.match, undefined, { numeric: true }));
+      if (!matches.length) return;
+      const sec = el("div", "score-group reveal");
+      sec.appendChild(el("h3", null, `<span class="group-badge">${esc(g)}</span> Group ${esc(g)}`));
+      matches.forEach((f) => {
+        sec.appendChild(scoreRow(
+          f.home, f.away, f.home_score, f.away_score,
+          f.result === "H", f.result === "A",
+          `${esc(ownerOf(f.home))} · ${ptsLabel(f.home_points)}`,
+          `${esc(ownerOf(f.away))} · ${ptsLabel(f.away_points)}`,
+          f.date_label || `Match ${f.match}`,
+        ));
+      });
+      wrap.appendChild(sec);
+    });
+
+    // Knockouts (no league points — show the result and who went through).
+    if (koPlayed.length) {
+      const sec = el("div", "score-group reveal");
+      sec.appendChild(el("h3", null, "🏆 Knockouts"));
+      koPlayed.sort((a, b) => a.number - b.number).forEach((m) => {
+        const pens = m.score1 === m.score2 && m.winner ? " · on penalties" : "";
+        sec.appendChild(scoreRow(
+          m.team1, m.team2, m.score1, m.score2,
+          m.winner === m.team1, m.winner === m.team2,
+          esc(ownerOf(m.team1)), esc(ownerOf(m.team2)),
+          m.round + pens,
+        ));
+      });
+      wrap.appendChild(sec);
+    }
   }
 
   /* ---------------------------------------------------------------- bracket */

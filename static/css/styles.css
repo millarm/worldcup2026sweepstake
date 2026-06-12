@@ -169,6 +169,25 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 30px clamp(14px, 3.5vw, 
 .third-card .team { font-weight: 700; }
 .third-card .owner { color: var(--muted); font-size: 0.8rem; }
 
+/* ---------- Scores ---------- */
+.score-group { margin-bottom: 28px; }
+.score-group h3 { display: flex; align-items: center; gap: 10px; font-size: 1.05rem; margin-bottom: 12px; }
+.score-row {
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px;
+  padding: 12px 18px; margin-bottom: 8px;
+}
+.sr-side .sr-name { font-weight: 700; font-size: 0.98rem; }
+.sr-side .sr-sub { font-size: 0.74rem; color: var(--muted); margin-top: 3px; }
+.sr-side.home { text-align: right; }
+.sr-side.away { text-align: left; }
+.sr-side.win .sr-name { color: var(--green); }
+.sr-side.win .sr-name::after { content: " ✓"; font-size: 0.7em; color: var(--green); }
+.sr-center { text-align: center; min-width: 84px; }
+.sr-score { font-family: "Archivo Black"; font-size: 1.35rem; white-space: nowrap; }
+.sr-score span { color: var(--muted); margin: 0 7px; font-family: "Sora"; font-weight: 400; }
+.sr-meta { font-size: 0.62rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+.empty { padding: 26px; text-align: center; color: var(--muted); }
+
 /* ---------- Bracket ---------- */
 .bracket-scroll { overflow-x: auto; padding-bottom: 14px; }
 .bracket { display: flex; gap: 26px; min-width: max-content; padding: 4px; }

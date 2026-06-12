@@ -46,6 +46,7 @@
   <!-- STICKY TABS -->
   <nav class="tabs" id="tabs">
     <button class="tab is-active" data-tab="groups">Groups</button>
+    <button class="tab" data-tab="scores">Scores</button>
     <button class="tab" data-tab="bracket">Knockouts</button>
     <button class="tab" data-tab="leaderboard">Leaderboard</button>
     <button class="tab" data-tab="players">Players</button>
@@ -66,6 +67,16 @@
         <p>The eight that sneak through. Ranked by points, goal difference, then goals scored.</p>
       </div>
       <div class="thirds" id="thirdsRow"></div>
+    </section>
+
+    <!-- SCORES -->
+    <section class="panel" id="panel-scores">
+      <div class="panel-head">
+        <h2>Score Tracker</h2>
+        <p>Every result so far — the scoreline, the points each team earned and the
+          player who owns each team. <span id="scoresSummary" class="muted"></span></p>
+      </div>
+      <div id="scores"></div>
     </section>
 
     <!-- BRACKET -->

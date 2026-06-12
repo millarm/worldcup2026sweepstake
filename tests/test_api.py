@@ -55,6 +55,18 @@ class TestWriteRoutes:
         groupA = res.get_json()["standings"]["A"]
         assert all(r["played"] == 0 for r in groupA)
 
+    def test_fixture_carries_points_when_played(self, client):
+        # Backs the Scores tab: played fixtures expose result + points per side.
+        client.post("/api/results/group", json={"match": "A1", "home": 3, "away": 0},
+                    headers=self.AUTH)
+        fixtures = client.get("/api/fixtures").get_json()["fixtures"]
+        a1 = next(f for f in fixtures if f["match"] == "A1")
+        assert a1["played"] is True and a1["result"] == "H"
+        assert a1["home_points"] == 3 and a1["away_points"] == 0
+        # Unplayed fixtures carry no points.
+        a2 = next(f for f in fixtures if f["match"] == "A2")
+        assert a2["played"] is False and a2["home_points"] is None
+
     def test_feed_refresh_populates(self, client):
         data = client.post("/api/feed/refresh", headers=self.AUTH).get_json()
         assert data["feed_summary"]["updated"] == 72
