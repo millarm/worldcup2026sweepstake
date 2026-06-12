@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import hmac
 import os
+import threading
 from functools import wraps
 
 from flask import Flask, jsonify, request, send_from_directory
@@ -85,6 +86,37 @@ _maybe_autoseed()
 _maybe_start_auto_feed()
 _maybe_start_scheduled_feed()
 
+# Lock that prevents more than one background lazy-refresh running at a time.
+_lazy_refresh_lock = threading.Lock()
+
+
+def _maybe_lazy_refresh() -> None:
+    """Fire a background feed refresh if results are overdue, non-blocking.
+
+    Called on every state-returning request.  The current request returns
+    immediately with the existing data; the *next* request will see fresh
+    results.  The lock ensures only one background refresh runs at a time
+    even if many visitors hit the site simultaneously.
+
+    Controlled by the same env vars as the scheduled feed:
+      WC_GAME_DURATION_MINS  — minutes after KO before results are expected
+      WC_FIXTURE_TZ          — IANA timezone of the fixture ko times
+    """
+    last = store.last_feed()
+    last_ran_at = last["ran_at"] if last else None
+    duration_mins = int(os.environ.get("WC_GAME_DURATION_MINS", "115"))
+    tz_name = os.environ.get("WC_FIXTURE_TZ", "UTC")
+    if not feed.is_refresh_overdue(last_ran_at, duration_mins, tz_name):
+        return
+    if not _lazy_refresh_lock.acquire(blocking=False):
+        return  # another refresh is already in flight
+    def _run():
+        try:
+            feed.apply_feed(store)
+        finally:
+            _lazy_refresh_lock.release()
+    threading.Thread(target=_run, name="wc-lazy-refresh", daemon=True).start()
+
 
 def _state() -> dict:
     state = compute_state(store.group_results(), store.ko_results())
@@ -129,6 +161,7 @@ def health():
 # --------------------------------------------------------------------------- #
 @app.get("/api/state")
 def api_state():
+    _maybe_lazy_refresh()
     return jsonify(_state())
 
 

@@ -221,6 +221,38 @@ def select_provider() -> object:
 
 
 # --------------------------------------------------------------------------- #
+#  On-demand overdue check
+# --------------------------------------------------------------------------- #
+def is_refresh_overdue(last_ran_at: str | None,
+                       duration_mins: int = 115,
+                       tz_name: str = "UTC") -> bool:
+    """Return True if a scheduled refresh time has passed since the last feed run.
+
+    Used to trigger a lazy background refresh when a visitor hits the site,
+    so stale results are corrected on the next request without needing a
+    long-running scheduler thread.
+
+    ``last_ran_at`` is the ISO-8601 timestamp from :meth:`Store.last_feed`
+    (``None`` if the feed has never run).
+    """
+    import datetime as _dt
+    now = _dt.datetime.now(_dt.timezone.utc)
+    times = scheduled_refresh_times(duration_mins, tz_name)
+
+    if last_ran_at is None:
+        return any(t <= now for t in times)
+
+    try:
+        last = _dt.datetime.fromisoformat(last_ran_at)
+        if last.tzinfo is None:
+            last = last.replace(tzinfo=_dt.timezone.utc)
+    except Exception:
+        return False
+
+    return any(last < t <= now for t in times)
+
+
+# --------------------------------------------------------------------------- #
 #  Automatic background polling
 # --------------------------------------------------------------------------- #
 _auto_thread = None
