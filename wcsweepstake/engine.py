@@ -18,8 +18,10 @@ Mapping to the workbook
 """
 from __future__ import annotations
 
+import json
 import unicodedata
 from dataclasses import dataclass, field, asdict
+from pathlib import Path
 from typing import Optional
 
 
@@ -242,27 +244,45 @@ BRACKET: dict[int, dict] = {
     104: {"round": "Final", "a": ("winner", 101), "b": ("winner", 102)},
 }
 
-# The eight Round-of-32 slots reserved for best-third-placed teams, mapped to the
-# group whose third-placed team fills them.  This is the fixed FIFA allocation
-# the workbook encodes for the qualifying-group combination A,B,C,D,F,G,K,L
-# (see the note in the Tracker sheet).
+# The eight Round-of-32 slots that host a best-third-placed team, in the column
+# order used by the official allocation table, with the group winner each hosts.
+THIRD_PLACE_MATCH_ORDER = (74, 77, 79, 80, 81, 82, 85, 87)
+
+# The group whose third-placed team fills each slot for the *canonical* combination
+# (A,B,C,D,F,G,K,L) — the single combination the workbook hard-codes.  Retained for
+# documentation / parity tests; live allocation uses the full official table below.
 THIRD_SLOT_GROUP = {74: "D", 77: "F", 79: "C", 80: "K", 81: "B", 82: "A", 85: "G", 87: "L"}
+
+# Official FIFA Annex C allocation: all 495 combinations of which eight groups
+# supply a qualifying third-placed team -> which group's third each slot hosts.
+# Loaded from data and verified against the FIFA regulations + official fixture
+# file (see third_place_allocation.json and tests/test_third_place_allocation.py).
+_ALLOC_PATH = Path(__file__).resolve().parent / "third_place_allocation.json"
+THIRD_PLACE_ALLOCATION: dict[str, str] = json.loads(
+    _ALLOC_PATH.read_text(encoding="utf-8"))["allocation"]
 
 
 def assign_third_slots(thirds: list[TeamRow]) -> dict[int, Optional[str]]:
     """Map each third-place Round-of-32 slot to a qualified third-placed team.
 
-    Primary pass uses the workbook's fixed group-letter allocation
-    (:data:`THIRD_SLOT_GROUP`) — so for the spreadsheet's canonical qualifying
-    combination (A,B,C,D,F,G,K,L) the result is identical to the workbook.
+    Uses the official FIFA Annex C allocation: the eight qualifying groups (sorted)
+    key into :data:`THIRD_PLACE_ALLOCATION`, whose value names, for each slot in
+    :data:`THIRD_PLACE_MATCH_ORDER`, the group whose third-placed team plays there.
+    This reproduces the official bracket for *any* qualifying-group combination
+    (and equals the workbook for its canonical one).
 
-    If the eight qualifiers come from a *different* set of groups (the workbook
-    would leave those ``XLOOKUP`` slots blank), the unmatched slots are filled
-    with the remaining qualifiers in ranking order, so the bracket always
-    completes for a live tournament.  This is the one place the site goes beyond
-    the spreadsheet, and only ever for cases the spreadsheet left undefined.
+    A defensive fallback (fixed canonical mapping + leftovers) covers the
+    theoretical case of an unrecognised combination, e.g. fewer than eight
+    third-placed teams mid-tournament.
     """
     by_group = {r.group: r.country for r in thirds}
+    key = "".join(sorted(by_group))
+    value = THIRD_PLACE_ALLOCATION.get(key)
+    if value and len(value) == len(THIRD_PLACE_MATCH_ORDER):
+        return {slot: by_group.get(group)
+                for slot, group in zip(THIRD_PLACE_MATCH_ORDER, value)}
+
+    # Fallback: canonical mapping first, then remaining qualifiers in ranking order.
     assigned: dict[int, Optional[str]] = {}
     used: set[str] = set()
     for slot in sorted(THIRD_SLOT_GROUP):

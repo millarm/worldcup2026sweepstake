@@ -103,21 +103,44 @@ pytest                         # 53 tests
 
 ---
 
-## The results feed
+## Live results that update automatically
 
-`POST /api/feed/refresh` pulls finished results and writes them to the store,
-mapping external team names (e.g. *South Korea*, *Turkey*) to our canonical
-spellings and locating each result's group fixture or knockout pairing. The
-provider is chosen automatically:
+The site wires up to **real results** and keeps itself current with no manual
+input:
+
+- **Source** — by default it reads ESPN's public scoreboard API for the World
+  Cup (`fifa.world`), which needs **no API key**. It maps external team names
+  (e.g. *South Korea*, *Turkey*, *Ivory Coast*) to our canonical spellings and
+  locates each result's group fixture or knockout pairing (resolving the live
+  bracket so knockout games are matched too).
+- **Auto-update (server)** — with `WC_FEED_AUTO=1` a background thread polls the
+  feed every `WC_FEED_INTERVAL` seconds (default 900) and writes new results to
+  the store.
+- **Auto-update (client)** — the page re-fetches `/api/state` every 60s, so
+  standings, bracket and leaderboard update live without a reload.
+
+Provider selection (first match wins):
 
 | Provider | Activated by | Source |
 |---|---|---|
 | `football-data` | `FOOTBALL_DATA_API_KEY` | [football-data.org](https://www.football-data.org) |
 | `url` | `WC_RESULTS_URL` | any JSON array of results |
-| `sample` | *(default)* | bundled `data/sample_results.json` |
+| `espn` | *(default)* | ESPN public scoreboard API — no key |
+| `sample` | `WC_FEED_SOURCE=sample` | bundled `data/sample_results.json` (offline) |
 
-To refresh automatically, point a scheduler (e.g. a Replit Scheduled Deployment
-or cron) at `POST /api/feed/refresh` every few minutes.
+`POST /api/feed/refresh` triggers a refresh on demand. You can also point an
+external scheduler (e.g. a Replit Scheduled Deployment) at that route.
+
+### Knockout third-place allocation (official FIFA Annex C)
+
+The eight best third-placed teams are seeded into the Round of 32 using the
+**official FIFA Annex C allocation** — all 495 possible combinations of which
+eight groups qualify. The table in `wcsweepstake/third_place_allocation.json`
+was verified to zero mismatches against FIFA's official fixture file and the
+published regulations (structure and slot pools), and `tests/
+test_third_place_allocation.py` re-checks every entry against the official
+pools. So the bracket seeds correctly for *any* outcome of the group stage, not
+just the spreadsheet's single hard-coded combination.
 
 ---
 

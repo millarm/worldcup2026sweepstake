@@ -47,7 +47,16 @@ def _maybe_autoseed() -> None:
         pass
 
 
+def _maybe_start_auto_feed() -> None:
+    """Start the background poller when WC_FEED_AUTO is set (see feed.start_auto_feed)."""
+    if not os.environ.get("WC_FEED_AUTO"):
+        return
+    interval = int(os.environ.get("WC_FEED_INTERVAL", "900"))
+    feed.start_auto_feed(store, interval=interval)
+
+
 _maybe_autoseed()
+_maybe_start_auto_feed()
 
 
 def _state() -> dict:

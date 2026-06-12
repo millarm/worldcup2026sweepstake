@@ -31,6 +31,12 @@ def client(tmp_path, monkeypatch):
     """Flask test client with an isolated in-memory database."""
     monkeypatch.setenv("WC_DB_PATH", str(tmp_path / "api.db"))
     monkeypatch.delenv("ADMIN_TOKEN", raising=False)
+    # Default feed source is the live ESPN API; pin to the offline sample so
+    # tests are deterministic and never touch the network.
+    monkeypatch.setenv("WC_FEED_SOURCE", "sample")
+    monkeypatch.delenv("WC_FEED_AUTO", raising=False)
+    monkeypatch.delenv("FOOTBALL_DATA_API_KEY", raising=False)
+    monkeypatch.delenv("WC_RESULTS_URL", raising=False)
     import importlib
     import app as app_module
     importlib.reload(app_module)

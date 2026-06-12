@@ -22,15 +22,7 @@
   const ROUND_ORDER = ["Round of 32", "Round of 16", "Quarter-final", "Semi-final", "Final"];
 
   /* ------------------------------------------------------------------ fetch */
-  async function load() {
-    try {
-      const res = await fetch("/api/state");
-      STATE = await res.json();
-    } catch (e) {
-      $("#feedStatus").textContent = "Could not reach the server.";
-      return;
-    }
-    ownerByCountry = Object.fromEntries((STATE.teams || []).map((t) => [t.country, t.owner_short]));
+  function renderAll() {
     renderPot();
     renderFeed();
     renderGroups();
@@ -39,7 +31,53 @@
     renderLeaderboard();
     renderPlayers();
     $("#footTournament").textContent = STATE.tournament;
+  }
+
+  // Set count-up numbers + leaderboard bars to their final values immediately
+  // (used on refresh/admin updates, where the intro animation isn't re-run).
+  function setNumbersInstant() {
+    $$("[data-count]").forEach((n) => {
+      n.textContent = (n.classList.contains("amt") ? "£" : "") + n.dataset.count;
+    });
+    $$(".lb-bar").forEach((b) => (b.style.width = b.dataset.w + "%"));
+  }
+
+  function hydrate(data) {
+    STATE = data;
+    ownerByCountry = Object.fromEntries((STATE.teams || []).map((t) => [t.country, t.owner_short]));
+    renderAll();
+  }
+
+  async function load() {
+    try {
+      const res = await fetch("/api/state");
+      hydrate(await res.json());
+    } catch (e) {
+      $("#feedStatus").textContent = "Could not reach the server.";
+      return;
+    }
     intro();
+    // The backend polls the live results feed; mirror that on the client so the
+    // page updates itself without a manual reload.
+    setInterval(refresh, 60000);
+  }
+
+  async function refresh() {
+    if (document.hidden) return; // don't poll a backgrounded tab
+    try {
+      const res = await fetch("/api/state");
+      const data = await res.json();
+      const before = STATE && STATE.feed ? STATE.feed.ran_at : null;
+      hydrate(data);
+      setNumbersInstant();
+      if (STATE.prizes && STATE.prizes.champion) fireConfetti();
+      if (before !== (STATE.feed && STATE.feed.ran_at)) flashUpdated();
+    } catch (e) { /* keep last good state on a transient error */ }
+  }
+
+  function flashUpdated() {
+    const node = $("#feedStatus");
+    if (hasGSAP && node) GS.fromTo(node, { opacity: 0.3 }, { opacity: 1, duration: 0.8 });
   }
 
   const withOwner = (country) =>
@@ -148,9 +186,12 @@
       wrap.appendChild(col);
     });
 
+    const existing = $("#championBanner");
+    if (existing) existing.remove(); // avoid stacking on re-render/refresh
     const champ = STATE.prizes && STATE.prizes.champion;
     if (champ) {
       const banner = el("div", "card champion-banner reveal");
+      banner.id = "championBanner";
       banner.innerHTML = `<div class="lbl muted">🏆 Champions</div>
         <div class="who">${withOwner(champ)}</div>`;
       $("#panel-bracket").appendChild(banner);
@@ -326,9 +367,9 @@
         const res = await fetch(url, { method, headers: headers(), body: body ? JSON.stringify(body) : undefined });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || res.statusText);
-        STATE = data; ownerByCountry = Object.fromEntries((STATE.teams || []).map((t) => [t.country, t.owner_short]));
-        renderPot(); renderFeed(); renderGroups(); renderThirds(); renderBracket(); renderLeaderboard(); renderPlayers();
-        $$("[data-count]").forEach((n) => (n.textContent = (n.classList.contains("amt") ? "£" : "") + n.dataset.count));
+        hydrate(data);
+        setNumbersInstant();
+        if (STATE.prizes && STATE.prizes.champion) fireConfetti();
         msg.innerHTML = data.feed_summary
           ? `✓ Feed (${esc(data.feed_summary.source)}): ${data.feed_summary.updated} updated, ${data.feed_summary.unmatched.length} unmatched`
           : "✓ Saved";

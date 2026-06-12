@@ -76,6 +76,58 @@ class TestApplyFeed:
         assert "network down" in summary["message"]
         assert store.last_feed()["ok"] is False
 
+    def test_espn_payload_parsing_and_application(self, store):
+        # A canned ESPN scoreboard payload (no network) drives the feed,
+        # including alias mapping (ESPN's "South Korea" -> "Korea Republic").
+        payload = {"events": [
+            {"season": {"slug": "2026"}, "competitions": [{
+                "status": {"type": {"state": "post", "completed": True}},
+                "competitors": [
+                    {"homeAway": "home", "team": {"displayName": "Mexico"}, "score": "2"},
+                    {"homeAway": "away", "team": {"displayName": "South Africa"}, "score": "0"},
+                ]}]},
+            {"season": {"slug": "2026"}, "competitions": [{
+                "status": {"type": {"state": "in", "completed": False}},
+                "competitors": [
+                    {"homeAway": "home", "team": {"displayName": "South Korea"}, "score": "1"},
+                    {"homeAway": "away", "team": {"displayName": "Czechia"}, "score": "1"},
+                ]}]},
+        ]}
+        rows = feed.parse_espn_scoreboard(payload)
+        assert rows[0] == {"home": "Mexico", "away": "South Africa", "home_score": 2,
+                           "away_score": 0, "status": "FINISHED", "stage": "2026"}
+        assert rows[1]["status"] == "IN"  # not finished -> won't be applied
+
+        summary = feed.apply_feed(store, FakeProvider(rows))
+        assert summary["updated"] == 1  # only the finished match
+        assert store.group_results()["A1"] == {"home": 2, "away": 0}
+
+    def test_select_provider_respects_environment(self, monkeypatch):
+        monkeypatch.delenv("FOOTBALL_DATA_API_KEY", raising=False)
+        monkeypatch.delenv("WC_RESULTS_URL", raising=False)
+        monkeypatch.setenv("WC_FEED_SOURCE", "espn")
+        assert isinstance(feed.select_provider(), feed.EspnProvider)
+        monkeypatch.setenv("WC_FEED_SOURCE", "sample")
+        assert isinstance(feed.select_provider(), feed.SampleProvider)
+        monkeypatch.setenv("FOOTBALL_DATA_API_KEY", "k")
+        assert isinstance(feed.select_provider(), feed.FootballDataProvider)
+
+    def test_auto_feed_thread_runs_and_populates(self, store):
+        # A short interval drives a refresh from the sample feed.
+        t = feed.start_auto_feed(store, interval=0.05, provider=feed.SampleProvider())
+        try:
+            import time
+            for _ in range(40):
+                if store.group_results():
+                    break
+                time.sleep(0.05)
+            assert store.group_results()  # the poller populated the store
+        finally:
+            # Stop and join before the store fixture closes the connection.
+            t._stop_event.set()
+            t.join(timeout=5)
+            assert not t.is_alive()
+
     def test_applies_knockout_result_after_groups(self, store):
         # Fill the whole group stage, then feed a Round-of-32 result and confirm
         # the feed locates the right knockout match by its (resolved) pairing.

@@ -1,10 +1,14 @@
 """Results feed — automatically pulls match results and populates the store.
 
-Three providers are supported, selected automatically by environment:
+Providers are selected automatically by environment:
 
 * ``football-data``  — football-data.org, when ``FOOTBALL_DATA_API_KEY`` is set.
 * ``url``            — any JSON endpoint, when ``WC_RESULTS_URL`` is set.
-* ``sample``         — bundled ``data/sample_results.json`` (default; offline).
+* ``espn``           — ESPN's public scoreboard API, no key required (default).
+* ``sample``         — bundled ``data/sample_results.json`` (``WC_FEED_SOURCE=sample``).
+
+:func:`start_auto_feed` runs a background thread that refreshes on an interval so
+the site updates itself without manual intervention.
 
 Every provider yields a list of *normalised* results::
 
@@ -118,13 +122,134 @@ class FootballDataProvider:
         return out
 
 
+def parse_espn_scoreboard(data: dict) -> list[dict]:
+    """Normalise an ESPN scoreboard payload into our result dicts.
+
+    Split out from the HTTP call so it can be unit-tested with canned JSON.
+    """
+    out = []
+    for event in data.get("events", []) or []:
+        comps = event.get("competitions") or []
+        if not comps:
+            continue
+        comp = comps[0]
+        status_type = ((comp.get("status") or {}).get("type")) or {}
+        home = away = None
+        for c in comp.get("competitors") or []:
+            if c.get("homeAway") == "home":
+                home = c
+            elif c.get("homeAway") == "away":
+                away = c
+        if not home or not away:
+            continue
+
+        def team_name(c):
+            t = c.get("team") or {}
+            return (t.get("displayName") or t.get("name")
+                    or t.get("shortDisplayName") or t.get("abbreviation"))
+
+        def score(c):
+            try:
+                return int(c.get("score"))
+            except (TypeError, ValueError):
+                return None
+
+        finished = bool(status_type.get("completed"))
+        out.append({
+            "home": team_name(home), "away": team_name(away),
+            "home_score": score(home), "away_score": score(away),
+            "status": "FINISHED" if finished else (status_type.get("state") or "SCHEDULED").upper(),
+            "stage": (event.get("season") or {}).get("slug"),
+        })
+    return out
+
+
+class EspnProvider:
+    """Live results from ESPN's public scoreboard API — no API key required.
+
+    Walks the tournament's days (start .. min(today, end)) and aggregates
+    finished matches. League slug and window are configurable via env
+    (``WC_ESPN_LEAGUE``, ``WC_TOURNAMENT_START``/``_END``).
+    """
+    name = "espn"
+    BASE = "https://site.api.espn.com/apis/site/v2/sports/soccer/{league}/scoreboard"
+
+    def __init__(self, league=None, start=None, end=None, dates=None):
+        self.league = league or os.environ.get("WC_ESPN_LEAGUE", "fifa.world")
+        self.start = start or os.environ.get("WC_TOURNAMENT_START", "2026-06-11")
+        self.end = end or os.environ.get("WC_TOURNAMENT_END", "2026-07-19")
+        self.dates = dates
+
+    def _days(self) -> list[str]:
+        import datetime as dt
+        start = dt.date.fromisoformat(self.start)
+        end = min(dt.date.fromisoformat(self.end), dt.date.today())
+        days, d = [], start
+        while d <= end:
+            days.append(d.strftime("%Y%m%d"))
+            d += dt.timedelta(days=1)
+        return days
+
+    def fetch(self) -> list[dict]:
+        import requests
+        url = self.BASE.format(league=self.league)
+        out = []
+        for day in (self.dates or self._days()):
+            try:
+                resp = requests.get(url, params={"dates": day}, timeout=15)
+                resp.raise_for_status()
+                out.extend(parse_espn_scoreboard(resp.json()))
+            except Exception:
+                continue  # skip a bad day, keep collecting the rest
+        return out
+
+
 def select_provider() -> object:
-    """Pick a provider based on the environment (see module docstring)."""
+    """Pick a provider based on the environment.
+
+    Priority: football-data.org (if ``FOOTBALL_DATA_API_KEY``) -> custom URL
+    (``WC_RESULTS_URL``) -> ``WC_FEED_SOURCE`` (``espn`` default, or ``sample``).
+    """
     if os.environ.get("FOOTBALL_DATA_API_KEY"):
         return FootballDataProvider(os.environ["FOOTBALL_DATA_API_KEY"])
     if os.environ.get("WC_RESULTS_URL"):
         return UrlProvider(os.environ["WC_RESULTS_URL"])
-    return SampleProvider()
+    source = os.environ.get("WC_FEED_SOURCE", "espn").lower()
+    if source == "sample":
+        return SampleProvider()
+    return EspnProvider()
+
+
+# --------------------------------------------------------------------------- #
+#  Automatic background polling
+# --------------------------------------------------------------------------- #
+_auto_thread = None
+
+
+def start_auto_feed(store, interval: int = 900, provider=None):
+    """Start a daemon thread that refreshes the feed every ``interval`` seconds.
+
+    Idempotent — a second call while one is running is a no-op. The first poll
+    happens after ``interval`` (initial population is handled by autoseed).
+    """
+    import threading
+    global _auto_thread
+    if _auto_thread and _auto_thread.is_alive():
+        return _auto_thread
+
+    stop = threading.Event()
+
+    def loop():
+        while not stop.wait(interval):
+            try:
+                apply_feed(store, provider)
+            except Exception:
+                pass  # transient feed/network errors must not kill the poller
+
+    _auto_thread = threading.Thread(target=loop, name="wc-auto-feed", daemon=True)
+    _auto_thread._stop_event = stop  # exposed for tests
+    _auto_thread.start()
+    return _auto_thread
 
 
 # --------------------------------------------------------------------------- #
