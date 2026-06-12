@@ -75,13 +75,34 @@ def compute_state(group_results: dict | None = None,
         for i, r in enumerate(thirds, 1)
     ]
 
+    completed = _completed_groups(group_results)
+    all_complete = len(completed) == len(DATA["groups"])
+
     matches = engine.resolve_bracket(standings, ko_results, DATA.get("knockout_meta"))
-    bracket_view = [matches[n].to_dict() for n in sorted(matches)]
+
+    def _seed_locked(seed) -> bool:
+        """Is a knockout seed's participant final (vs a live projection)?"""
+        kind = seed[0]
+        if kind == "group":
+            return seed[1] in completed            # group table is final
+        if kind == "third":
+            return all_complete                    # best-thirds settled
+        if kind in ("winner", "loser"):
+            src = matches.get(seed[1])
+            return bool(src and src.winner)         # feeding match decided
+        return False
+
+    bracket_view = []
+    for n in sorted(matches):
+        d = matches[n].to_dict()
+        spec = engine.BRACKET[n]
+        # Teams are "locked" only when both come from decided inputs, so the UI
+        # can distinguish real upcoming ties from shifting projections.
+        d["teams_locked"] = _seed_locked(spec["a"]) and _seed_locked(spec["b"])
+        bracket_view.append(d)
 
     # Officially-decided Round-of-32 qualifiers (gates knockout scoring so a mere
     # bracket projection never awards progress points before games are played).
-    completed = _completed_groups(group_results)
-    all_complete = len(completed) == len(DATA["groups"])
     qualified_r32: set[str] = set()
     eliminated_in_group: set[str] = set()
     for group, rows in standings.items():
