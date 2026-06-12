@@ -149,17 +149,17 @@
   }
 
   /* ----------------------------------------------------------------- scores */
-  // One result row: Home (owner · pts) — score – score — Away (owner · pts).
-  function scoreRow(home, away, hs, as_, homeWin, awayWin, homeSub, awaySub, meta) {
-    const row = el("div", "score-row card");
+  // One match row. Played -> "score – score"; upcoming -> "vs" + kickoff.
+  function scoreRow(home, away, hs, as_, homeWin, awayWin, homeSub, awaySub, meta, upcoming) {
+    const center = upcoming
+      ? `<div class="sr-vs">vs</div>`
+      : `<div class="sr-score">${hs}<span>–</span>${as_}</div>`;
+    const row = el("div", "score-row card" + (upcoming ? " upcoming" : ""));
     row.innerHTML = `
       <div class="sr-side home ${homeWin ? "win" : ""}">
         <div class="sr-name">${esc(home)}</div><div class="sr-sub">${homeSub}</div>
       </div>
-      <div class="sr-center">
-        <div class="sr-score">${hs}<span>–</span>${as_}</div>
-        ${meta ? `<div class="sr-meta">${esc(meta)}</div>` : ""}
-      </div>
+      <div class="sr-center">${center}${meta ? `<div class="sr-meta">${esc(meta)}</div>` : ""}</div>
       <div class="sr-side away ${awayWin ? "win" : ""}">
         <div class="sr-name">${esc(away)}</div><div class="sr-sub">${awaySub}</div>
       </div>`;
@@ -169,55 +169,78 @@
   const ptsLabel = (p) => (p > 0 ? "+" : "") + p; // +3 / +1 / 0
   const ownerOf = (c) => ownerByCountry[c] || "?";
 
+  // Flatten group fixtures + knockout ties into one comparable match shape.
+  function allMatches() {
+    const list = [];
+    (STATE.fixtures || []).forEach((f) => list.push({
+      kind: "group", home: f.home, away: f.away,
+      played: f.played, hs: f.home_score, as: f.away_score, result: f.result,
+      hPts: f.home_points, aPts: f.away_points, winner: null,
+      date: f.date, dateLabel: f.date_label, ko: f.ko, tag: "Group " + f.group,
+    }));
+    (STATE.bracket || []).forEach((m) => list.push({
+      kind: "ko", home: m.team1, away: m.team2, locked: m.teams_locked,
+      played: m.score1 != null && m.score2 != null, hs: m.score1, as: m.score2,
+      winner: m.winner, date: m.meta && m.meta.date, dateLabel: (m.meta && m.meta.date_label) || "",
+      ko: (m.meta && m.meta.ko) || "", tag: m.round,
+      pens: m.score1 != null && m.score1 === m.score2 && m.winner,
+    }));
+    return list;
+  }
+
+  const dtKey = (m) => `${m.date || "9999-99-99"}T${m.ko || "99:99"}`;
+
+  function playedRow(m) {
+    const when = [m.dateLabel, m.tag].filter(Boolean).join(" · ");
+    if (m.kind === "group") {
+      return scoreRow(m.home, m.away, m.hs, m.as, m.result === "H", m.result === "A",
+        `${esc(ownerOf(m.home))} · ${ptsLabel(m.hPts)}`,
+        `${esc(ownerOf(m.away))} · ${ptsLabel(m.aPts)}`, when);
+    }
+    return scoreRow(m.home, m.away, m.hs, m.as, m.winner === m.home, m.winner === m.away,
+      esc(ownerOf(m.home)), esc(ownerOf(m.away)), when + (m.pens ? " · on penalties" : ""));
+  }
+
+  function upcomingRow(m) {
+    const meta = [m.dateLabel, m.ko, m.tag].filter(Boolean).join(" · ");
+    return scoreRow(m.home, m.away, null, null, false, false,
+      esc(ownerOf(m.home)), esc(ownerOf(m.away)), meta, true);
+  }
+
+  function column(title, emptyText, rows) {
+    const col = el("div", "scores-col reveal");
+    col.appendChild(el("h3", "col-head", title));
+    if (!rows.length) {
+      col.appendChild(el("div", "card empty", emptyText));
+    } else {
+      rows.forEach((node) => col.appendChild(node));
+    }
+    return col;
+  }
+
   function renderScores() {
     const wrap = $("#scores");
     wrap.innerHTML = "";
-    const groupPlayed = (STATE.fixtures || []).filter((f) => f.played);
-    const koPlayed = (STATE.bracket || []).filter((m) => m.score1 != null && m.score2 != null);
+    const matches = allMatches();
+    const played = matches.filter((m) => m.played);
+    // Upcoming = not played, with confirmed teams. Group fixtures always count;
+    // knockout ties only once their teams are locked (not a live projection).
+    const upcoming = matches.filter((m) =>
+      !m.played && m.home && m.away && (m.kind === "group" || m.locked));
+
     $("#scoresSummary").textContent =
-      `${groupPlayed.length + koPlayed.length} of 104 matches played.`;
+      `${played.length} of 104 played · ${upcoming.length} coming up.`;
 
-    if (!groupPlayed.length && !koPlayed.length) {
-      wrap.appendChild(el("div", "card empty",
-        "No results yet — scores will appear here as games are played."));
-      return;
-    }
+    // Most recent first; soonest first.
+    played.sort((a, b) => dtKey(b).localeCompare(dtKey(a)));
+    upcoming.sort((a, b) => dtKey(a).localeCompare(dtKey(b)));
 
-    // Group stage, organised by group (so a team's results sit together).
-    STATE.groups.forEach((g) => {
-      const matches = groupPlayed
-        .filter((f) => f.group === g)
-        .sort((a, b) => a.match.localeCompare(b.match, undefined, { numeric: true }));
-      if (!matches.length) return;
-      const sec = el("div", "score-group reveal");
-      sec.appendChild(el("h3", null, `<span class="group-badge">${esc(g)}</span> Group ${esc(g)}`));
-      matches.forEach((f) => {
-        sec.appendChild(scoreRow(
-          f.home, f.away, f.home_score, f.away_score,
-          f.result === "H", f.result === "A",
-          `${esc(ownerOf(f.home))} · ${ptsLabel(f.home_points)}`,
-          `${esc(ownerOf(f.away))} · ${ptsLabel(f.away_points)}`,
-          f.date_label || `Match ${f.match}`,
-        ));
-      });
-      wrap.appendChild(sec);
-    });
-
-    // Knockouts (no league points — show the result and who went through).
-    if (koPlayed.length) {
-      const sec = el("div", "score-group reveal");
-      sec.appendChild(el("h3", null, "🏆 Knockouts"));
-      koPlayed.sort((a, b) => a.number - b.number).forEach((m) => {
-        const pens = m.score1 === m.score2 && m.winner ? " · on penalties" : "";
-        sec.appendChild(scoreRow(
-          m.team1, m.team2, m.score1, m.score2,
-          m.winner === m.team1, m.winner === m.team2,
-          esc(ownerOf(m.team1)), esc(ownerOf(m.team2)),
-          m.round + pens,
-        ));
-      });
-      wrap.appendChild(sec);
-    }
+    const cols = el("div", "scores-cols");
+    cols.appendChild(column("🟢 Recent results", "No results yet — check back after kick-off.",
+      played.map(playedRow)));
+    cols.appendChild(column("📅 Upcoming fixtures", "No fixtures left — the tournament is complete!",
+      upcoming.map(upcomingRow)));
+    wrap.appendChild(cols);
   }
 
   /* ---------------------------------------------------------------- bracket */
