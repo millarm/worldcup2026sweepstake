@@ -37,6 +37,7 @@ def client(tmp_path, monkeypatch):
     # tests are deterministic and never touch the network.
     monkeypatch.setenv("WC_FEED_SOURCE", "sample")
     monkeypatch.delenv("WC_FEED_AUTO", raising=False)
+    monkeypatch.delenv("WC_FEED_SCHEDULED", raising=False)
     monkeypatch.delenv("FOOTBALL_DATA_API_KEY", raising=False)
     monkeypatch.delenv("WC_RESULTS_URL", raising=False)
     import importlib

@@ -2,7 +2,7 @@
 # Click "Run" to install dependencies and start the Flask server.
 run = "pip install -q -r requirements.txt && python3 app.py"
 entrypoint = "app.py"
-modules = ["python-3.11:v1"]
+modules = ["python-3.11", "postgresql-16"]
 
 [nix]
 channel = "stable-24_05"
@@ -24,11 +24,11 @@ run = ["sh", "-c", "python3 app.py"]
 deploymentTarget = "cloudrun"
 
 [[ports]]
-localPort = 8080
+localPort = 5000
 externalPort = 80
 
 [[ports]]
-localPort = 5000
+localPort = 8080
 externalPort = 80
 
 [agent]
