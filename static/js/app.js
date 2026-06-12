@@ -561,10 +561,14 @@
     if (totalSecs <= 15) {
       node.textContent = "⟳ Refreshing now…";
     } else {
-      const mins = Math.floor(totalSecs / 60);
-      const secs = totalSecs % 60;
+      const days  = Math.floor(totalSecs / 86400);
+      const hours = Math.floor((totalSecs % 86400) / 3600);
+      const mins  = Math.floor((totalSecs % 3600) / 60);
+      const secs  = totalSecs % 60;
       const parts = [];
-      if (mins > 0) parts.push(`${mins}m`);
+      if (days  > 0) parts.push(`${days}d`);
+      if (hours > 0) parts.push(`${hours}h`);
+      if (mins  > 0) parts.push(`${mins}m`);
       parts.push(`${secs}s`);
       node.textContent = `⏱ Next update in ${parts.join(" ")}`;
     }
