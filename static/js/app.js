@@ -27,6 +27,7 @@
     renderFeed();
     renderGroups();
     renderThirds();
+    renderScores();
     renderBracket();
     renderLeaderboard();
     renderPlayers();
@@ -145,6 +146,78 @@
         <div class="owner">Group ${esc(t.group)} · ${t.points} pts · GD ${t.gd > 0 ? "+" : ""}${t.gd}</div></div>`;
       row.appendChild(c);
     });
+  }
+
+  /* ----------------------------------------------------------------- scores */
+  // One result row: Home (owner · pts) — score – score — Away (owner · pts).
+  function scoreRow(home, away, hs, as_, homeWin, awayWin, homeSub, awaySub, meta) {
+    const row = el("div", "score-row card");
+    row.innerHTML = `
+      <div class="sr-side home ${homeWin ? "win" : ""}">
+        <div class="sr-name">${esc(home)}</div><div class="sr-sub">${homeSub}</div>
+      </div>
+      <div class="sr-center">
+        <div class="sr-score">${hs}<span>–</span>${as_}</div>
+        ${meta ? `<div class="sr-meta">${esc(meta)}</div>` : ""}
+      </div>
+      <div class="sr-side away ${awayWin ? "win" : ""}">
+        <div class="sr-name">${esc(away)}</div><div class="sr-sub">${awaySub}</div>
+      </div>`;
+    return row;
+  }
+
+  const ptsLabel = (p) => (p > 0 ? "+" : "") + p; // +3 / +1 / 0
+  const ownerOf = (c) => ownerByCountry[c] || "?";
+
+  function renderScores() {
+    const wrap = $("#scores");
+    wrap.innerHTML = "";
+    const groupPlayed = (STATE.fixtures || []).filter((f) => f.played);
+    const koPlayed = (STATE.bracket || []).filter((m) => m.score1 != null && m.score2 != null);
+    $("#scoresSummary").textContent =
+      `${groupPlayed.length + koPlayed.length} of 104 matches played.`;
+
+    if (!groupPlayed.length && !koPlayed.length) {
+      wrap.appendChild(el("div", "card empty",
+        "No results yet — scores will appear here as games are played."));
+      return;
+    }
+
+    // Group stage, organised by group (so a team's results sit together).
+    STATE.groups.forEach((g) => {
+      const matches = groupPlayed
+        .filter((f) => f.group === g)
+        .sort((a, b) => a.match.localeCompare(b.match, undefined, { numeric: true }));
+      if (!matches.length) return;
+      const sec = el("div", "score-group reveal");
+      sec.appendChild(el("h3", null, `<span class="group-badge">${esc(g)}</span> Group ${esc(g)}`));
+      matches.forEach((f) => {
+        sec.appendChild(scoreRow(
+          f.home, f.away, f.home_score, f.away_score,
+          f.result === "H", f.result === "A",
+          `${esc(ownerOf(f.home))} · ${ptsLabel(f.home_points)}`,
+          `${esc(ownerOf(f.away))} · ${ptsLabel(f.away_points)}`,
+          f.date_label || `Match ${f.match}`,
+        ));
+      });
+      wrap.appendChild(sec);
+    });
+
+    // Knockouts (no league points — show the result and who went through).
+    if (koPlayed.length) {
+      const sec = el("div", "score-group reveal");
+      sec.appendChild(el("h3", null, "🏆 Knockouts"));
+      koPlayed.sort((a, b) => a.number - b.number).forEach((m) => {
+        const pens = m.score1 === m.score2 && m.winner ? " · on penalties" : "";
+        sec.appendChild(scoreRow(
+          m.team1, m.team2, m.score1, m.score2,
+          m.winner === m.team1, m.winner === m.team2,
+          esc(ownerOf(m.team1)), esc(ownerOf(m.team2)),
+          m.round + pens,
+        ));
+      });
+      wrap.appendChild(sec);
+    }
   }
 
   /* ---------------------------------------------------------------- bracket */
@@ -348,24 +421,67 @@
   }
 
   /* ---------------------------------------------------------------- admin */
+  const ADMIN_KEY = "wc26-admin-pw"; // sessionStorage key for the unlocked password
+
   function setupAdmin() {
     const drawer = $("#adminDrawer");
-    const open = () => drawer.classList.add("open");
+    const lock = $("#adminLock");
+    const controls = $("#adminControls");
+    const lockMsg = $("#lockMsg");
+    const msg = $("#adminMsg");
+
+    const password = () => sessionStorage.getItem(ADMIN_KEY) || "";
+    const headers = () => ({ "Content-Type": "application/json", "X-Admin-Token": password() });
+
+    const showLocked = () => { controls.hidden = true; lock.hidden = false; $("#adminPassword").focus(); };
+    const showUnlocked = () => { lock.hidden = true; controls.hidden = false; };
+
+    const open = () => {
+      drawer.classList.add("open");
+      // Re-verify any stored password each time the drawer opens.
+      if (password()) verify(password()).then((ok) => (ok ? showUnlocked() : showLocked()));
+      else showLocked();
+    };
     const close = () => drawer.classList.remove("open");
     $("#adminToggle").addEventListener("click", open);
     $("#adminClose").addEventListener("click", close);
-    const msg = $("#adminMsg");
-    const token = () => $("#adminTokenInput").value.trim();
-    const headers = () => {
-      const h = { "Content-Type": "application/json" };
-      if (token()) h["X-Admin-Token"] = token();
-      return h;
-    };
+
+    async function verify(pw) {
+      try {
+        const res = await fetch("/api/admin/login", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ password: pw }),
+        });
+        return res.ok;
+      } catch (e) { return false; }
+    }
+
+    lock.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      lockMsg.textContent = "Checking…";
+      const pw = $("#adminPassword").value;
+      if (await verify(pw)) {
+        sessionStorage.setItem(ADMIN_KEY, pw);
+        $("#adminPassword").value = "";
+        lockMsg.textContent = "";
+        showUnlocked();
+      } else {
+        lockMsg.textContent = "⚠︎ Incorrect password";
+      }
+    });
+
+    $("#lockBtn").addEventListener("click", () => {
+      sessionStorage.removeItem(ADMIN_KEY);
+      msg.textContent = "";
+      showLocked();
+    });
+
     const post = async (url, body, method = "POST") => {
       msg.textContent = "Working…";
       try {
         const res = await fetch(url, { method, headers: headers(), body: body ? JSON.stringify(body) : undefined });
         const data = await res.json();
+        if (res.status === 401) { showLocked(); lockMsg.textContent = "⚠︎ Session expired — re-enter the password"; return; }
         if (!res.ok) throw new Error(data.error || res.statusText);
         hydrate(data);
         setNumbersInstant();

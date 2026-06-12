@@ -12,13 +12,17 @@ DEL  /api/results/group/<m>  -> clear a group result           (admin)
 POST /api/results/ko         -> {match_no, score1, score2, override} (admin)
 POST /api/feed/refresh       -> pull results from the feed and populate (admin)
 GET  /api/feed/status        -> last feed run
+POST /api/admin/login        -> validate the admin password
 POST /api/admin/reset        -> wipe all stored results        (admin)
 
-Admin routes require the ``X-Admin-Token`` header to equal ``ADMIN_TOKEN`` when
-that environment variable is set; if it is unset (local dev) they are open.
+The admin panel is password-protected: admin routes require the password in the
+``X-Admin-Token`` header (or ``admin_password`` JSON field).  The password is
+``ADMIN_PASSWORD``/``ADMIN_TOKEN`` from the environment, falling back to a
+built-in default so the deployed site works out of the box.
 """
 from __future__ import annotations
 
+import hmac
 import os
 from functools import wraps
 
@@ -29,6 +33,13 @@ from wcsweepstake.store import Store
 
 app = Flask(__name__, static_folder="static", static_url_path="/static")
 store = Store()
+
+# Password protecting the admin panel (feed refresh, score entry, reset).
+# Overridable via the ADMIN_PASSWORD / ADMIN_TOKEN environment variable; the
+# default keeps the deployed site working out of the box.
+ADMIN_PASSWORD = (os.environ.get("ADMIN_PASSWORD")
+                  or os.environ.get("ADMIN_TOKEN")
+                  or "BenEvesonIsInControl")
 
 
 def _maybe_autoseed() -> None:
@@ -65,11 +76,20 @@ def _state() -> dict:
     return state
 
 
+def _password_ok(supplied: str | None) -> bool:
+    """Constant-time check of a supplied admin password."""
+    return bool(supplied) and hmac.compare_digest(str(supplied), ADMIN_PASSWORD)
+
+
 def admin_required(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
-        token = os.environ.get("ADMIN_TOKEN")
-        if token and request.headers.get("X-Admin-Token") != token:
+        # Password may arrive as the X-Admin-Token header (used by the panel) or
+        # an `admin_password` field in a JSON body.
+        supplied = request.headers.get("X-Admin-Token")
+        if supplied is None and request.is_json:
+            supplied = (request.get_json(silent=True) or {}).get("admin_password")
+        if not _password_ok(supplied):
             return jsonify({"error": "unauthorised"}), 401
         return fn(*args, **kwargs)
     return wrapper
@@ -126,6 +146,15 @@ def api_feed_status():
 # --------------------------------------------------------------------------- #
 #  Write APIs (admin)
 # --------------------------------------------------------------------------- #
+@app.post("/api/admin/login")
+def api_admin_login():
+    """Validate the admin password so the panel can unlock its controls."""
+    body = request.get_json(force=True, silent=True) or {}
+    if _password_ok(body.get("password")):
+        return jsonify({"ok": True})
+    return jsonify({"ok": False, "error": "incorrect password"}), 401
+
+
 @app.post("/api/results/group")
 @admin_required
 def api_set_group():
