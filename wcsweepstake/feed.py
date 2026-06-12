@@ -253,6 +253,106 @@ def start_auto_feed(store, interval: int = 900, provider=None):
 
 
 # --------------------------------------------------------------------------- #
+#  Schedule-based feed triggers
+# --------------------------------------------------------------------------- #
+_scheduled_thread = None
+
+
+def scheduled_refresh_times(duration_mins: int = 115, tz_name: str = "UTC") -> list:
+    """Return a sorted list of UTC datetimes when a feed refresh should fire.
+
+    Each datetime is ``duration_mins`` after the scheduled kick-off of each
+    fixture (i.e. roughly when the game should have ended).  Duplicate times
+    (simultaneous kick-offs) are collapsed to a single entry.
+
+    ``tz_name`` is the IANA timezone the ``ko`` times in the fixture data are
+    expressed in (e.g. ``"UTC"``, ``"America/New_York"``).  Defaults to UTC.
+    """
+    import datetime as dt
+    try:
+        import zoneinfo
+        tz = zoneinfo.ZoneInfo(tz_name)
+    except Exception:
+        tz = dt.timezone.utc
+
+    duration = dt.timedelta(minutes=duration_mins)
+    seen: set = set()
+    times: list = []
+    for fx in DATA["fixtures"]:
+        try:
+            date_str = fx["date"]       # "YYYY-MM-DD"
+            ko_str = fx["ko"]           # "HH:MM"
+            naive = dt.datetime.fromisoformat(f"{date_str}T{ko_str}:00")
+            aware = naive.replace(tzinfo=tz)
+            fire_at = (aware + duration).astimezone(dt.timezone.utc)
+            key = fire_at.replace(second=0, microsecond=0)
+            if key not in seen:
+                seen.add(key)
+                times.append(fire_at)
+        except Exception:
+            continue
+    times.sort()
+    return times
+
+
+def start_scheduled_feed(store, duration_mins: int = 115, tz_name: str = "UTC",
+                         provider=None):
+    """Start a daemon thread that fires a feed refresh after each scheduled game ends.
+
+    The thread sleeps until the next game's expected end time, refreshes the
+    feed, then moves on to the next game.  Games whose scheduled end time is
+    already in the past are skipped on startup (a one-time catch-up refresh is
+    run immediately if any past games were skipped).
+
+    Idempotent — a second call while one is running is a no-op.
+
+    Environment variables (read by :func:`app._maybe_start_scheduled_feed`):
+    - ``WC_FEED_SCHEDULED=1``      — enables this scheduler
+    - ``WC_GAME_DURATION_MINS``    — minutes after KO to refresh (default 115)
+    - ``WC_FIXTURE_TZ``            — IANA tz of the ``ko`` times (default UTC)
+    """
+    import threading
+
+    global _scheduled_thread
+    if _scheduled_thread and _scheduled_thread.is_alive():
+        return _scheduled_thread
+
+    stop = threading.Event()
+
+    def _loop():
+        import datetime as _dt
+        now = _dt.datetime.now(_dt.timezone.utc)
+        times = scheduled_refresh_times(duration_mins, tz_name)
+
+        future = [t for t in times if t > now]
+        past   = [t for t in times if t <= now]
+
+        if past:
+            # Catch-up: any games that have already ended — refresh once on startup.
+            try:
+                apply_feed(store, provider)
+            except Exception:
+                pass
+
+        for fire_at in future:
+            now = _dt.datetime.now(_dt.timezone.utc)
+            wait_secs = (fire_at - now).total_seconds()
+            if wait_secs > 0:
+                if stop.wait(wait_secs):
+                    break  # shutdown requested
+            try:
+                apply_feed(store, provider)
+            except Exception:
+                pass  # transient errors must not kill the scheduler
+
+    _scheduled_thread = threading.Thread(target=_loop, name="wc-scheduled-feed",
+                                         daemon=True)
+    _scheduled_thread._stop_event = stop  # exposed for tests
+    _scheduled_thread.start()
+    return _scheduled_thread
+
+
+# --------------------------------------------------------------------------- #
 #  Applying a feed to the store
 # --------------------------------------------------------------------------- #
 def _group_fixture_index() -> dict[frozenset, dict]:

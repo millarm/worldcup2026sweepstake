@@ -66,8 +66,24 @@ def _maybe_start_auto_feed() -> None:
     feed.start_auto_feed(store, interval=interval)
 
 
+def _maybe_start_scheduled_feed() -> None:
+    """Start the schedule-based feed when WC_FEED_SCHEDULED is set.
+
+    Fires a feed refresh after each game's scheduled end time.  Configure with:
+      WC_FEED_SCHEDULED=1         — enable
+      WC_GAME_DURATION_MINS=115   — minutes after KO to refresh (default 115)
+      WC_FIXTURE_TZ=UTC           — IANA timezone of the ko times in fixture data
+    """
+    if not os.environ.get("WC_FEED_SCHEDULED"):
+        return
+    duration_mins = int(os.environ.get("WC_GAME_DURATION_MINS", "115"))
+    tz_name = os.environ.get("WC_FIXTURE_TZ", "UTC")
+    feed.start_scheduled_feed(store, duration_mins=duration_mins, tz_name=tz_name)
+
+
 _maybe_autoseed()
 _maybe_start_auto_feed()
+_maybe_start_scheduled_feed()
 
 
 def _state() -> dict:
