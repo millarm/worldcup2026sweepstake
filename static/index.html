@@ -107,36 +107,50 @@
   <aside class="admin" id="adminDrawer" aria-hidden="true">
     <div class="admin-inner">
       <header><h3>⚙︎ Admin</h3><button id="adminClose">✕</button></header>
-      <label>Admin token <small>(only if the server sets one)</small>
-        <input type="password" id="adminTokenInput" placeholder="X-Admin-Token" />
-      </label>
-      <button class="btn primary" id="refreshFeed">⟳ Pull latest results (feed)</button>
-      <p class="hint" id="adminMsg"></p>
 
-      <details>
-        <summary>Enter a group result</summary>
-        <div class="row">
-          <input id="gMatch" placeholder="Match e.g. A1" />
-          <input id="gHome" type="number" min="0" placeholder="Home" />
-          <input id="gAway" type="number" min="0" placeholder="Away" />
-          <button class="btn" id="gSave">Save</button>
-        </div>
-      </details>
+      <!-- Locked: password gate -->
+      <form class="admin-lock" id="adminLock">
+        <p class="muted">🔒 Enter the admin password to manage results.</p>
+        <label>Password
+          <input type="password" id="adminPassword" placeholder="Password" autocomplete="current-password" />
+        </label>
+        <button class="btn primary" id="unlockBtn" type="submit">Unlock</button>
+        <p class="hint" id="lockMsg"></p>
+      </form>
 
-      <details>
-        <summary>Enter a knockout result</summary>
-        <div class="row">
-          <input id="kNo" type="number" placeholder="Match # (73–104)" />
-          <input id="kS1" type="number" min="0" placeholder="Score 1" />
-          <input id="kS2" type="number" min="0" placeholder="Score 2" />
+      <!-- Unlocked: controls (hidden until authenticated) -->
+      <div class="admin-controls" id="adminControls" hidden>
+        <div class="admin-status">
+          <span>🔓 Unlocked</span><button class="btn ghost" id="lockBtn" type="button">Lock</button>
         </div>
-        <div class="row">
-          <input id="kOverride" placeholder="Winner override (for ties)" />
-          <button class="btn" id="kSave">Save</button>
-        </div>
-      </details>
+        <button class="btn primary" id="refreshFeed">⟳ Pull latest results (feed)</button>
+        <p class="hint" id="adminMsg"></p>
 
-      <button class="btn danger" id="resetAll">Reset all results</button>
+        <details>
+          <summary>Enter a group result</summary>
+          <div class="row">
+            <input id="gMatch" placeholder="Match e.g. A1" />
+            <input id="gHome" type="number" min="0" placeholder="Home" />
+            <input id="gAway" type="number" min="0" placeholder="Away" />
+            <button class="btn" id="gSave">Save</button>
+          </div>
+        </details>
+
+        <details>
+          <summary>Enter a knockout result</summary>
+          <div class="row">
+            <input id="kNo" type="number" placeholder="Match # (73–104)" />
+            <input id="kS1" type="number" min="0" placeholder="Score 1" />
+            <input id="kS2" type="number" min="0" placeholder="Score 2" />
+          </div>
+          <div class="row">
+            <input id="kOverride" placeholder="Winner override (for ties)" />
+            <button class="btn" id="kSave">Save</button>
+          </div>
+        </details>
+
+        <button class="btn danger" id="resetAll">Reset all results</button>
+      </div>
     </div>
   </aside>
 

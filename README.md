@@ -150,8 +150,18 @@ just the spreadsheet's single hard-coded combination.
 2. Press **Run**. `.replit` installs `requirements.txt` and starts the server on
    port 8080; `WC_AUTOSEED=1` shows demo data on first boot.
 3. Optional environment variables:
-   - `ADMIN_TOKEN` — require an `X-Admin-Token` header on write/feed routes.
+   - `ADMIN_PASSWORD` — override the admin-panel password (see below).
    - `FOOTBALL_DATA_API_KEY` — pull live results instead of the sample feed.
+
+### Admin panel
+
+The ⚙︎ panel (feed refresh, manual score entry, reset) is **password-protected**.
+Open it, enter the password and the controls unlock for the browser session.
+Admin API routes require the password in the `X-Admin-Token` header (or an
+`admin_password` JSON field) and `POST /api/admin/login` validates it. The
+password is taken from `ADMIN_PASSWORD` (or `ADMIN_TOKEN`), falling back to a
+built-in default so the deployed site works out of the box — set
+`ADMIN_PASSWORD` to change it.
 
 ---
 
@@ -162,6 +172,7 @@ just the spreadsheet's single hard-coded combination.
 | `GET` | `/api/state` | Full computed state |
 | `GET` | `/api/fixtures` `/api/bracket` `/api/leaderboard` | Slices of state |
 | `GET` | `/api/feed/status` | Last feed run |
+| `POST` | `/api/admin/login` | Validate the admin password |
 | `POST` | `/api/results/group` | `{match, home, away}` *(admin)* |
 | `DELETE` | `/api/results/group/<match>` | *(admin)* |
 | `POST` | `/api/results/ko` | `{match_no, score1, score2, override}` *(admin)* |

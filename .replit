@@ -15,7 +15,8 @@ WC_FEED_AUTO = "1"
 WC_FEED_INTERVAL = "900"          # background poll every 15 minutes
 # Live results come from ESPN's public API by default (no key needed).
 # WC_FEED_SOURCE = "sample"       # use the bundled demo data instead
-# Optional: set ADMIN_TOKEN to protect the write/feed routes.
+# The admin panel is password-protected (built-in default). Override here:
+# ADMIN_PASSWORD = "choose-your-own"
 # Optional: set FOOTBALL_DATA_API_KEY (football-data.org) for an alternate source.
 
 [deployment]
