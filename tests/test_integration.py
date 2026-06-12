@@ -44,6 +44,16 @@ class TestComputeState:
         assert scores == sorted(scores, reverse=True)
         assert board[0]["score"] > 0
 
+    def test_teams_locked_distinguishes_real_ties_from_projections(self):
+        # Backs the Scores tab's "upcoming" filter.
+        state = compute_state()
+        assert all(not m["teams_locked"] for m in state["bracket"])  # nothing decided
+        state = compute_state(group_results=_full_group_stage())
+        r32 = [m for m in state["bracket"] if m["round"] == "Round of 32"]
+        r16 = [m for m in state["bracket"] if m["round"] == "Round of 16"]
+        assert all(m["teams_locked"] for m in r32)       # group stage done -> R32 set
+        assert all(not m["teams_locked"] for m in r16)   # R32 not played -> R16 still TBD
+
     def test_prizes_unassigned_until_final_decided(self):
         state = compute_state(group_results=_full_group_stage())
         assert state["prizes"]["champion"] is None
