@@ -192,6 +192,22 @@ def api_feed_status():
     return jsonify({"feed": store.last_feed()})
 
 
+@app.get("/api/feed/schedule")
+def api_feed_schedule():
+    """Return upcoming feed-refresh times as ISO-8601 UTC strings.
+
+    Derived from fixture kick-off times plus the configured game duration.
+    Only future times are included (past ones have already been handled).
+    """
+    import datetime as dt
+    duration_mins = int(os.environ.get("WC_GAME_DURATION_MINS", "115"))
+    tz_name = os.environ.get("WC_FIXTURE_TZ", "UTC")
+    now = dt.datetime.now(dt.timezone.utc)
+    times = feed.scheduled_refresh_times(duration_mins, tz_name)
+    upcoming = [t.isoformat() for t in times if t > now]
+    return jsonify({"schedule": upcoming})
+
+
 # --------------------------------------------------------------------------- #
 #  Write APIs (admin)
 # --------------------------------------------------------------------------- #

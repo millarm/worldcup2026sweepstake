@@ -522,10 +522,73 @@
     $("#resetAll").addEventListener("click", () => { if (confirm("Wipe all stored results?")) post("/api/admin/reset"); });
   }
 
+  /* ----------------------------------------------------------- countdown */
+  let _countdownTimes = [];   // sorted list of upcoming Date objects
+  let _countdownTimer = null;
+
+  async function fetchSchedule() {
+    try {
+      const res = await fetch("/api/feed/schedule");
+      const data = await res.json();
+      _countdownTimes = (data.schedule || [])
+        .map((s) => new Date(s))
+        .filter((d) => !isNaN(d))
+        .sort((a, b) => a - b);
+    } catch (e) {
+      _countdownTimes = [];
+    }
+  }
+
+  function tickCountdown() {
+    const node = $("#nextRefresh");
+    if (!node) return;
+
+    const now = Date.now();
+    // Drop times that have already passed.
+    while (_countdownTimes.length && _countdownTimes[0].getTime() <= now) {
+      _countdownTimes.shift();
+    }
+
+    if (!_countdownTimes.length) {
+      node.textContent = "";
+      return;
+    }
+
+    const diffMs = _countdownTimes[0].getTime() - now;
+    if (diffMs < 0) { node.textContent = ""; return; }
+
+    const totalSecs = Math.ceil(diffMs / 1000);
+    if (totalSecs <= 15) {
+      node.textContent = "⟳ Refreshing now…";
+    } else {
+      const mins = Math.floor(totalSecs / 60);
+      const secs = totalSecs % 60;
+      const parts = [];
+      if (mins > 0) parts.push(`${mins}m`);
+      parts.push(`${secs}s`);
+      node.textContent = `⏱ Next update in ${parts.join(" ")}`;
+    }
+  }
+
+  async function setupCountdown() {
+    await fetchSchedule();
+    tickCountdown();
+    if (_countdownTimer) clearInterval(_countdownTimer);
+    _countdownTimer = setInterval(() => {
+      tickCountdown();
+      // Re-fetch the schedule once per minute to stay in sync.
+      const now = Date.now();
+      if (!setupCountdown._lastFetch || now - setupCountdown._lastFetch >= 60000) {
+        setupCountdown._lastFetch = now;
+        fetchSchedule();
+      }
+    }, 1000);
+  }
+
   /* ----------------------------------------------------------------- boot */
   document.addEventListener("DOMContentLoaded", () => {
     setupTabs();
     setupAdmin();
-    load();
+    load().then(() => setupCountdown());
   });
 })();
