@@ -328,7 +328,7 @@ def scheduled_refresh_times(duration_mins: int = 115, tz_name: str = "UTC") -> l
 
 
 def start_scheduled_feed(store, duration_mins: int = 115, tz_name: str = "UTC",
-                         provider=None):
+                         provider=None, retry_mins: int | None = None):
     """Start a daemon thread that fires a feed refresh after each scheduled game ends.
 
     The thread sleeps until the next game's expected end time, refreshes the
@@ -336,18 +336,29 @@ def start_scheduled_feed(store, duration_mins: int = 115, tz_name: str = "UTC",
     already in the past are skipped on startup (a one-time catch-up refresh is
     run immediately if any past games were skipped).
 
+    After each refresh a secondary "safety-net" retry fires ``retry_mins``
+    minutes later to catch games that ran into extra time / penalties.  Set
+    ``retry_mins=0`` (or ``WC_FEED_RETRY_MINS=0``) to disable.
+
     Idempotent — a second call while one is running is a no-op.
 
     Environment variables (read by :func:`app._maybe_start_scheduled_feed`):
     - ``WC_FEED_SCHEDULED=1``      — enables this scheduler
     - ``WC_GAME_DURATION_MINS``    — minutes after KO to refresh (default 115)
     - ``WC_FIXTURE_TZ``            — IANA tz of the ``ko`` times (default UTC)
+    - ``WC_FEED_RETRY_MINS``       — safety-net delay in minutes (default 15, 0 = off)
     """
     import threading
 
     global _scheduled_thread
     if _scheduled_thread and _scheduled_thread.is_alive():
         return _scheduled_thread
+
+    if retry_mins is None:
+        try:
+            retry_mins = int(os.environ.get("WC_FEED_RETRY_MINS", 15))
+        except (TypeError, ValueError):
+            retry_mins = 15
 
     stop = threading.Event()
 
@@ -365,6 +376,13 @@ def start_scheduled_feed(store, duration_mins: int = 115, tz_name: str = "UTC",
                 apply_feed(store, provider)
             except Exception:
                 pass
+            # Safety-net retry for the catch-up refresh.
+            if retry_mins and retry_mins > 0:
+                if not stop.wait(retry_mins * 60):
+                    try:
+                        apply_feed(store, provider)
+                    except Exception:
+                        pass
 
         for fire_at in future:
             now = _dt.datetime.now(_dt.timezone.utc)
@@ -376,6 +394,15 @@ def start_scheduled_feed(store, duration_mins: int = 115, tz_name: str = "UTC",
                 apply_feed(store, provider)
             except Exception:
                 pass  # transient errors must not kill the scheduler
+            # Safety-net retry: re-check the feed after retry_mins in case the
+            # game ran long (extra time, penalties, broadcast delay).
+            if retry_mins and retry_mins > 0:
+                if stop.wait(retry_mins * 60):
+                    break  # shutdown requested during retry wait
+                try:
+                    apply_feed(store, provider)
+                except Exception:
+                    pass
 
     _scheduled_thread = threading.Thread(target=_loop, name="wc-scheduled-feed",
                                          daemon=True)
