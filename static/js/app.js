@@ -348,24 +348,67 @@
   }
 
   /* ---------------------------------------------------------------- admin */
+  const ADMIN_KEY = "wc26-admin-pw"; // sessionStorage key for the unlocked password
+
   function setupAdmin() {
     const drawer = $("#adminDrawer");
-    const open = () => drawer.classList.add("open");
+    const lock = $("#adminLock");
+    const controls = $("#adminControls");
+    const lockMsg = $("#lockMsg");
+    const msg = $("#adminMsg");
+
+    const password = () => sessionStorage.getItem(ADMIN_KEY) || "";
+    const headers = () => ({ "Content-Type": "application/json", "X-Admin-Token": password() });
+
+    const showLocked = () => { controls.hidden = true; lock.hidden = false; $("#adminPassword").focus(); };
+    const showUnlocked = () => { lock.hidden = true; controls.hidden = false; };
+
+    const open = () => {
+      drawer.classList.add("open");
+      // Re-verify any stored password each time the drawer opens.
+      if (password()) verify(password()).then((ok) => (ok ? showUnlocked() : showLocked()));
+      else showLocked();
+    };
     const close = () => drawer.classList.remove("open");
     $("#adminToggle").addEventListener("click", open);
     $("#adminClose").addEventListener("click", close);
-    const msg = $("#adminMsg");
-    const token = () => $("#adminTokenInput").value.trim();
-    const headers = () => {
-      const h = { "Content-Type": "application/json" };
-      if (token()) h["X-Admin-Token"] = token();
-      return h;
-    };
+
+    async function verify(pw) {
+      try {
+        const res = await fetch("/api/admin/login", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ password: pw }),
+        });
+        return res.ok;
+      } catch (e) { return false; }
+    }
+
+    lock.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      lockMsg.textContent = "Checking…";
+      const pw = $("#adminPassword").value;
+      if (await verify(pw)) {
+        sessionStorage.setItem(ADMIN_KEY, pw);
+        $("#adminPassword").value = "";
+        lockMsg.textContent = "";
+        showUnlocked();
+      } else {
+        lockMsg.textContent = "⚠︎ Incorrect password";
+      }
+    });
+
+    $("#lockBtn").addEventListener("click", () => {
+      sessionStorage.removeItem(ADMIN_KEY);
+      msg.textContent = "";
+      showLocked();
+    });
+
     const post = async (url, body, method = "POST") => {
       msg.textContent = "Working…";
       try {
         const res = await fetch(url, { method, headers: headers(), body: body ? JSON.stringify(body) : undefined });
         const data = await res.json();
+        if (res.status === 401) { showLocked(); lockMsg.textContent = "⚠︎ Session expired — re-enter the password"; return; }
         if (!res.ok) throw new Error(data.error || res.statusText);
         hydrate(data);
         setNumbersInstant();

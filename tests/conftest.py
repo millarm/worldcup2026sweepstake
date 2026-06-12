@@ -31,6 +31,8 @@ def client(tmp_path, monkeypatch):
     """Flask test client with an isolated in-memory database."""
     monkeypatch.setenv("WC_DB_PATH", str(tmp_path / "api.db"))
     monkeypatch.delenv("ADMIN_TOKEN", raising=False)
+    # Pin a known admin password so write/feed routes can be authenticated.
+    monkeypatch.setenv("ADMIN_PASSWORD", "test-admin-pw")
     # Default feed source is the live ESPN API; pin to the offline sample so
     # tests are deterministic and never touch the network.
     monkeypatch.setenv("WC_FEED_SOURCE", "sample")

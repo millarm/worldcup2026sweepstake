@@ -253,7 +253,17 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 30px clamp(14px, 3.5vw, 
 .btn:hover { transform: translateY(-1px); background: rgba(255,255,255,0.14); }
 .btn.primary { background: linear-gradient(100deg, var(--gold), var(--pink)); color: #1a1030; border: 0; }
 .btn.danger { background: rgba(255,77,141,0.16); border-color: rgba(255,77,141,0.4); color: var(--pink); }
+.btn.ghost { background: transparent; padding: 6px 10px; font-size: 0.8rem; }
 .hint { font-size: 0.8rem; color: var(--muted); min-height: 1em; }
+.admin-lock, .admin-controls { display: flex; flex-direction: column; gap: 14px; }
+.admin-lock p { margin: 0; font-size: 0.86rem; }
+.admin-status {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 0.82rem; color: var(--green);
+  padding: 8px 12px; border: 1px solid var(--line); border-radius: 10px;
+  background: rgba(43,255,136,0.08);
+}
+[hidden] { display: none !important; }
 
 /* ---------- Footer ---------- */
 .foot { text-align: center; padding: 40px 20px 60px; color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--line); }
