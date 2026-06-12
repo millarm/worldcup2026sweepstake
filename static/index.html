@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>World Cup 2026 Sweepstake</title>
+  <meta name="description" content="The team World Cup 2026 sweepstake — live group tables, knockout bracket and leaderboard." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Archivo+Black&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/css/styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏆</text></svg>" />
+</head>
+<body>
+  <!-- Animated aurora backdrop -->
+  <div class="aurora" aria-hidden="true">
+    <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span>
+  </div>
+  <canvas id="confetti" aria-hidden="true"></canvas>
+
+  <!-- HERO -->
+  <header class="hero" id="top">
+    <nav class="topbar">
+      <a class="brand" href="#top"><span class="brand-ball">⚽</span> Sweepstake&nbsp;<b>2026</b></a>
+      <button class="admin-toggle" id="adminToggle" title="Admin tools">⚙︎</button>
+    </nav>
+
+    <div class="hero-inner">
+      <p class="kicker" data-anim="kicker">FIFA World Cup&nbsp;&bull;&nbsp;USA · Canada · Mexico</p>
+      <h1 class="title">
+        <span class="line" data-anim="title">THE OFFICE</span>
+        <span class="line accent" data-anim="title">SWEEPSTAKE</span>
+      </h1>
+      <p class="subtitle" data-anim="subtitle">
+        48 teams. 20 players. One trophy. Track every group, every goal and every
+        knockout — and see who's walking away with the pot.
+      </p>
+
+      <div class="pot" id="potStrip" data-anim="pot"><!-- filled by JS --></div>
+      <p class="feed-status" id="feedStatus" data-anim="subtitle"></p>
+    </div>
+
+    <div class="scroll-cue" aria-hidden="true">▾</div>
+  </header>
+
+  <!-- STICKY TABS -->
+  <nav class="tabs" id="tabs">
+    <button class="tab is-active" data-tab="groups">Groups</button>
+    <button class="tab" data-tab="bracket">Knockouts</button>
+    <button class="tab" data-tab="leaderboard">Leaderboard</button>
+    <button class="tab" data-tab="players">Players</button>
+    <span class="tab-ink" id="tabInk"></span>
+  </nav>
+
+  <main>
+    <!-- GROUPS -->
+    <section class="panel is-active" id="panel-groups">
+      <div class="panel-head">
+        <h2>Group Stage</h2>
+        <p>Top two of each group advance, plus the eight best third-placed teams. Owner in brackets.</p>
+      </div>
+      <div class="group-grid" id="groupGrid"></div>
+
+      <div class="panel-head sub">
+        <h3>⭐ Best third-placed teams</h3>
+        <p>The eight that sneak through. Ranked by points, goal difference, then goals scored.</p>
+      </div>
+      <div class="thirds" id="thirdsRow"></div>
+    </section>
+
+    <!-- BRACKET -->
+    <section class="panel" id="panel-bracket">
+      <div class="panel-head">
+        <h2>Knockout Bracket</h2>
+        <p>From the Round of 32 to the Final. Winners flow rightward as results land.</p>
+      </div>
+      <div class="bracket-scroll">
+        <div class="bracket" id="bracket"></div>
+      </div>
+    </section>
+
+    <!-- LEADERBOARD -->
+    <section class="panel" id="panel-leaderboard">
+      <div class="panel-head">
+        <h2>Leaderboard</h2>
+        <p>Each player's score = their teams' group points plus bonuses for every knockout round reached.</p>
+      </div>
+      <div class="board" id="board"></div>
+    </section>
+
+    <!-- PLAYERS -->
+    <section class="panel" id="panel-players">
+      <div class="panel-head">
+        <h2>Players &amp; Teams</h2>
+        <p>Who drew whom. A green dot means still in it; grey means knocked out.</p>
+      </div>
+      <div class="players" id="players"></div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>Built from the team sweepstake spreadsheet · <span id="footTournament"></span></p>
+    <p class="muted">£5 a team · pot split 1st / 2nd / MIND charity</p>
+  </footer>
+
+  <!-- ADMIN DRAWER -->
+  <aside class="admin" id="adminDrawer" aria-hidden="true">
+    <div class="admin-inner">
+      <header><h3>⚙︎ Admin</h3><button id="adminClose">✕</button></header>
+      <label>Admin token <small>(only if the server sets one)</small>
+        <input type="password" id="adminTokenInput" placeholder="X-Admin-Token" />
+      </label>
+      <button class="btn primary" id="refreshFeed">⟳ Pull latest results (feed)</button>
+      <p class="hint" id="adminMsg"></p>
+
+      <details>
+        <summary>Enter a group result</summary>
+        <div class="row">
+          <input id="gMatch" placeholder="Match e.g. A1" />
+          <input id="gHome" type="number" min="0" placeholder="Home" />
+          <input id="gAway" type="number" min="0" placeholder="Away" />
+          <button class="btn" id="gSave">Save</button>
+        </div>
+      </details>
+
+      <details>
+        <summary>Enter a knockout result</summary>
+        <div class="row">
+          <input id="kNo" type="number" placeholder="Match # (73–104)" />
+          <input id="kS1" type="number" min="0" placeholder="Score 1" />
+          <input id="kS2" type="number" min="0" placeholder="Score 2" />
+        </div>
+        <div class="row">
+          <input id="kOverride" placeholder="Winner override (for ties)" />
+          <button class="btn" id="kSave">Save</button>
+        </div>
+      </details>
+
+      <button class="btn danger" id="resetAll">Reset all results</button>
+    </div>
+  </aside>
+
+  <!-- GSAP (animation) — vendored locally so the site is self-contained -->
+  <script src="/static/js/vendor/gsap.min.js"></script>
+  <script src="/static/js/vendor/ScrollTrigger.min.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

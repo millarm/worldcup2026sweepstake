@@ -1,0 +1,14 @@
+[project]
+name = "worldcup2026sweepstake"
+version = "1.0.0"
+description = "World Cup 2026 office sweepstake — Flask backend + GSAP frontend, built from the team spreadsheet."
+requires-python = ">=3.10"
+dependencies = ["Flask>=3.0", "requests>=2.28"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.setuptools]
+packages = ["wcsweepstake"]

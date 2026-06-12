@@ -1,0 +1,27 @@
+# Replit configuration — World Cup 2026 Sweepstake
+# Click "Run" to install dependencies and start the Flask server.
+run = "pip install -q -r requirements.txt && python3 app.py"
+entrypoint = "app.py"
+modules = ["python-3.11:v1"]
+
+[nix]
+channel = "stable-24_05"
+
+[env]
+PORT = "8080"
+# Pull real results on first boot and keep updating automatically.
+WC_AUTOSEED = "1"
+WC_FEED_AUTO = "1"
+WC_FEED_INTERVAL = "900"          # background poll every 15 minutes
+# Live results come from ESPN's public API by default (no key needed).
+# WC_FEED_SOURCE = "sample"       # use the bundled demo data instead
+# Optional: set ADMIN_TOKEN to protect the write/feed routes.
+# Optional: set FOOTBALL_DATA_API_KEY (football-data.org) for an alternate source.
+
+[deployment]
+run = ["sh", "-c", "python3 app.py"]
+deploymentTarget = "cloudrun"
+
+[[ports]]
+localPort = 8080
+externalPort = 80
