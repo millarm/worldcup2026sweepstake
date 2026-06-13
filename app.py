@@ -36,11 +36,9 @@ app = Flask(__name__, static_folder="static", static_url_path="/static")
 store = Store()
 
 # Password protecting the admin panel (feed refresh, score entry, reset).
-# Overridable via the ADMIN_PASSWORD / ADMIN_TOKEN environment variable; the
-# default keeps the deployed site working out of the box.
-ADMIN_PASSWORD = (os.environ.get("ADMIN_PASSWORD")
-                  or os.environ.get("ADMIN_TOKEN")
-                  or "BenEvesonIsInControl")
+# Must be set via the ADMIN_PASSWORD (or legacy ADMIN_TOKEN) environment
+# variable.  When unset, all admin routes return 503.
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD") or os.environ.get("ADMIN_TOKEN") or None
 
 
 def _maybe_autoseed() -> None:
@@ -125,7 +123,12 @@ def _state() -> dict:
 
 
 def _password_ok(supplied: str | None) -> bool:
-    """Constant-time check of a supplied admin password."""
+    """Constant-time check of a supplied admin password.
+
+    Returns False (never grants access) when ADMIN_PASSWORD is not configured.
+    """
+    if not ADMIN_PASSWORD:
+        return False
     return bool(supplied) and hmac.compare_digest(str(supplied), ADMIN_PASSWORD)
 
 

@@ -103,8 +103,8 @@ class TestAdminPassword:
                           json={"match": "A1", "home": 2, "away": 1, "admin_password": "test-admin-pw"})
         assert res.status_code == 200
 
-    def test_builtin_default_password(self, tmp_path, monkeypatch):
-        # With no env override, the built-in default password protects the panel.
+    def test_no_password_configured(self, tmp_path, monkeypatch):
+        # When ADMIN_PASSWORD is not set, all admin routes must be locked.
         monkeypatch.setenv("WC_DB_PATH", str(tmp_path / "auth.db"))
         monkeypatch.delenv("ADMIN_PASSWORD", raising=False)
         monkeypatch.delenv("ADMIN_TOKEN", raising=False)
@@ -112,12 +112,13 @@ class TestAdminPassword:
         import app as app_module
         importlib.reload(app_module)
         c = app_module.app.test_client()
-        assert c.post("/api/admin/login", json={"password": "BenEvesonIsInControl"}).status_code == 200
-        # A write route (no network) is locked without the password, open with it.
+        # Login always fails when no password is configured.
+        assert c.post("/api/admin/login", json={"password": "anything"}).status_code == 401
+        # Write routes are inaccessible too.
         body = {"match": "A1", "home": 1, "away": 0}
         assert c.post("/api/results/group", json=body).status_code == 401
         assert c.post("/api/results/group", json=body,
-                      headers={"X-Admin-Token": "BenEvesonIsInControl"}).status_code == 200
+                      headers={"X-Admin-Token": "anything"}).status_code == 401
 
     def test_env_override_password(self, tmp_path, monkeypatch):
         monkeypatch.setenv("WC_DB_PATH", str(tmp_path / "auth2.db"))
