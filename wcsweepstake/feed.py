@@ -46,6 +46,7 @@ TEAM_ALIASES = {
     "congo dr": "Congo DR", "congo dr (congo)": "Congo DR",
     "bosnia & herzegovina": "Bosnia and Herzegovina",
     "bosnia and herzegovina": "Bosnia and Herzegovina",
+    "bosnia-herzegovina": "Bosnia and Herzegovina",
     "colombia": "Colombia", "columbia": "Colombia",
 }
 
