@@ -351,6 +351,7 @@
     if (!ink) return;
     ink.style.width = btn.offsetWidth - 24 + "px";
     ink.style.left = btn.offsetLeft + 12 + "px";
+    ink.style.top = btn.offsetTop + btn.offsetHeight - 9 + "px";
   }
   function setupTabs() {
     const tabs = $$(".tab");

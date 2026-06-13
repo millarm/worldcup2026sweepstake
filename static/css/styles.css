@@ -115,8 +115,8 @@ button { font-family: inherit; cursor: pointer; }
 .tab:hover { color: var(--ink); }
 .tab.is-active { color: var(--ink); }
 .tab-ink {
-  position: absolute; bottom: 6px; height: 3px; border-radius: 3px;
-  background: linear-gradient(90deg, var(--gold), var(--pink)); transition: all .35s cubic-bezier(.6,.2,.1,1);
+  position: absolute; height: 3px; border-radius: 3px;
+  background: linear-gradient(90deg, var(--gold), var(--pink)); transition: left .35s cubic-bezier(.6,.2,.1,1), width .35s cubic-bezier(.6,.2,.1,1), top .35s cubic-bezier(.6,.2,.1,1);
 }
 
 /* ---------- Panels ---------- */
